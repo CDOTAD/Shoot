@@ -15,15 +15,16 @@ class MainScene;
 class MainStep2Scene;
 class MainStep3Scene;
 
-class ArrowSpriteLayer :public Layer{
+class ArrowSpriteLayer :public Layer
+{
 public:
 	static ArrowSpriteLayer* createArrow();
 	bool init();
 	/*触摸监听函数*/
 	bool onTouchBegan(Touch* touch, Event* event);
-	void onTouchMoved(Touch* touch, Event* event);
 	void onTouchEnded(Touch* touch, Event* event);
 	void onTouchCancelled(Touch* touch, Event* event);
+	void onMouseMove(Event* event);
 	/*根据瓦片地图里的信息初始化箭的位置*/
 	void setArrowPosition(TMXObjectGroup* arrowObjectGroup);
 	/*获取箭头精灵*/
@@ -39,7 +40,7 @@ public:
 public:
 	bool isflying = false;
 	float scores = 0;
-	static  int step ;
+	static  int step;
 
 	MainScene* layer1;
 	MainStep2Scene* layer2;
@@ -47,9 +48,9 @@ public:
 private:
 	/*箭头精灵*/
 	Sprite* arrowSprite;
-	
+
 	int spriteNum = 0;
-	
+
 	LabelTTF* labelArrowNumLeft;
 
 	int ARROWNUMBER;
@@ -60,7 +61,7 @@ private:
 	double touchBeganTime;
 	//存储触摸事件结束时的时间
 	double touchEndedTime;
-	
+
 	char name[20];
 	/*用于存放箭头精灵的容器*/
 	Vector<Sprite*> vecArrowSprite;
