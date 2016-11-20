@@ -23,7 +23,7 @@ class MainScene :public Layer{
 public:
 	static Scene* CreateScene();
 	virtual bool init();
-	void update(float dt);
+	virtual void update(float dt);
 	void judge(float dt);
 	void Pause();
 	void setBurning(float dt);

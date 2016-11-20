@@ -357,8 +357,8 @@ Sprite* ArrowSpriteLayer::getArrowSprite(){
 
 void ArrowSpriteLayer::changeArrowSpriteReferTo(){
 
-	auto origin = Director::getInstance()->getVisibleOrigin();
-	auto visibleSize = Director::getInstance()->getVisibleSize();
+	//auto origin = Director::getInstance()->getVisibleOrigin();
+	//auto visibleSize = Director::getInstance()->getVisibleSize();
 	if (spriteNum <= this->ARROWNUMBER){
 		spriteNum++;
 	}
@@ -366,7 +366,7 @@ void ArrowSpriteLayer::changeArrowSpriteReferTo(){
 		
 		arrowSprite = vecArrowSprite.at(spriteNum);
 
-		log("ArrowSpriteLayer::changeArrowSpriteReferTo arrowSpritePosition = (%f,%f)", arrowSprite->getPositionX(), arrowSprite->getPositionY());
+		//log("ArrowSpriteLayer::changeArrowSpriteReferTo arrowSpritePosition = (%f,%f)", arrowSprite->getPositionX(), arrowSprite->getPositionY());
 
 		auto physicsArrowBody = PhysicsBody::createBox(arrowSprite->getContentSize());
 		physicsArrowBody->setGravityEnable(false);

@@ -73,9 +73,11 @@ bool MainStep2Scene::init(){
 		auto nodeB = contact.getShapeB()->getBody()->getNode();
 		if (nodeA&&nodeB){
 			if (nodeA->getTag() == 10){
+				nodeB->getPhysicsBody()->removeFromWorld();
 				nodeB->removeFromParentAndCleanup(true);
 			}
 			else if (nodeB->getTag() == 10){
+				nodeA->getPhysicsBody()->removeFromWorld();
 				nodeA->removeFromParentAndCleanup(true);
 			}
 			monster->monsterNumberDecrease();
@@ -83,12 +85,19 @@ bool MainStep2Scene::init(){
 
 		//arrow->getPhysicsBody()->removeFromWorld();
 
-		arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
-		arrow->getArrowSprite()->setVisible(false);
-		if (monster->getMonsterNumber() > 0){
-			arrow->changeArrowSpriteReferTo();
-		}
+		//arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
+		//arrow->getArrowSprite()->setVisible(false);
+		//if (monster->getMonsterNumber() > 0){
+		//	arrow->changeArrowSpriteReferTo();
+		//}
 		return true;
+	};
+
+	contactListener->onContactSeparate = [=](PhysicsContact &contact) {
+	
+		this->arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+		this->arrow->getArrowSprite()->setVisible(false);
+		this->arrow->changeArrowSpriteReferTo();
 	};
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
 
@@ -137,9 +146,9 @@ void MainStep2Scene::update(float dt){
 
 			if (tiledGid != 0){
 
-				//arrowSprite->getPhysicsBody()->removeFromWorld();
+				arrowSprite->getPhysicsBody()->removeFromWorld();
 
-				arrowSprite->removeFromParent();//removeFromPhysicsWorld();
+				//arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 				arrowSprite->stopAllActions();
 				this->arrow->changeArrowSpriteReferTo();
 			}

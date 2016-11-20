@@ -22,6 +22,8 @@ bool MainScene::init(){
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("AS_Zombie.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("B_Figure.plist");
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Pictures.plist");
+
 
 	Director* dir = Director::getInstance();
 	Size visibleSize = dir->getVisibleSize();
@@ -38,16 +40,15 @@ bool MainScene::init(){
 
 
 	/*´´½¨ÍË³ö°´Å¥*/
-	/*auto exitButton = MenuItemSprite::create(
+	auto exitButton = MenuItemSprite::create(
 		Sprite::createWithSpriteFrameName("exit.png"),
 		Sprite::createWithSpriteFrameName("exitOn.png"),
 		CC_CALLBACK_1(MainScene::menuExitCallBack, this));
 	exitButton->setScale(0.4);
-	*/
-	/*
+	
 	auto menu = Menu::create(exitButton, NULL);
 	menu->setPosition(visibleSize.width*0.9, 32);
-	this->addChild(menu, 2);*/
+	this->addChild(menu, 2);
 
 	/*¼ÓÔØ¼ýÍ·*/
 	this->arrow = ArrowSpriteLayer::create();
@@ -105,6 +106,7 @@ bool MainScene::init(){
 
 	/*Åö×²¼àÌýÆ÷*/
 	auto contactListener = EventListenerPhysicsContact::create();
+	
 	contactListener->onContactBegin = [=](PhysicsContact &contact){
 		auto nodeA = contact.getShapeA()->getBody()->getNode();
 		auto nodeB = contact.getShapeB()->getBody()->getNode();
@@ -112,41 +114,32 @@ bool MainScene::init(){
 			if (nodeA->getTag() == 10){
 				//nodeB->getPhysicsBody()->removeFromWorld();
 				//nodeB->removeFromParent();
+				nodeB->getPhysicsBody()->removeFromWorld();
 				nodeB->removeFromParentAndCleanup(true);
 			}
 			else if (nodeB->getTag() == 10){
 				//nodeA->getPhysicsBody()->removeFromWorld();
 				//nodeA->removeFromParent();
+				nodeA->getPhysicsBody()->removeFromWorld();
 				nodeA->removeFromParentAndCleanup(true);
 			}
 			monster->monsterNumberDecrease();
 		}
-		//arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
 
-		//log("contactArrowTag = %d", arrow->getArrowSprite()->getTag());
 
-		//arrow->getArrowSprite()->setTag(11);
-
-		//Point arrowPoint = arrow->getArrowSprite()->getPosition();
-
-		//log("contactArrowTag = %d", arrow->getArrowSprite()->getTag());
-		//arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
-		//arrow->getArrowSprite()->removeFromParentAndCleanup(true);
-		//arrow->getArrowSprite()->stopAllActions();
-		//arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
-		//arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
-		//arrow->getArrowSprite()->setVisible(false);
-		//if (monster->getMonsterNumber() > 0){
-		//	arrow->changeArrowSpriteReferTo(); 
-		//}
-
-		//arrow->getArrowSprite()->setPosition(arrowPoint);
-
-		//log("new arrowSprite position = (%f,%f)", arrow->getArrowSprite()->getPositionX(), arrow->getArrowSprite()->getPositionY());
-
-		//log("new arrowSpriteTag = %d", arrow->getArrowSprite()->getTag());
 		return true;
 	};
+
+	contactListener->onContactSeparate = [=](PhysicsContact &contact) {
+
+		this->arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+		
+		this->arrow->getArrowSprite()->setVisible(false);
+		if (monster->getMonsterNumber() > 0) {
+			this->arrow->changeArrowSpriteReferTo();
+		}	
+	};
+
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
 	
 	/*¼üÅÌ¼àÌýÆ÷*/
@@ -176,9 +169,6 @@ void MainScene::update(float dt){
 	Sprite* arrowSprite = this->arrow->getArrowSprite();
 	Point arrowPoint = arrowSprite->getPosition();
 
-	log("update new arrowSprite position = (%f,%f)", arrowPoint.x, arrowPoint.y);
-
-	log("update new ArrowSpriteTag = %d", arrowSprite->getTag());
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	/*·É³öÆÁÄ»ÉÏ·½ÔòºöÂÔ*/
@@ -188,10 +178,10 @@ void MainScene::update(float dt){
 		//Size mapTiledNum = this->map->getMap()->getMapSize();
 		Size tiledSize = this->map->getMap()->getTileSize();
 		if (arrowPoint.x + arrowSize.width / 2 < visibleSize.width){
-			int tiledPosX = (arrowPoint.x + arrowSize.width / 2) / tiledSize.width;
-			int tiledPosY = (639-arrowPoint.y) / tiledSize.height;
+			int tiledPosX = (arrowPoint.x + arrowSize.width /2) / tiledSize.width;
+			int tiledPosY = (639 - arrowPoint.y) / tiledSize.height;
 
-			log("arrwPoint.y = %f", arrowPoint.y);
+			//log("arrwPoint.y = %f", arrowPoint.y);
 
 			Point tiledPos = Point(tiledPosX, tiledPosY);
 
