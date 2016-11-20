@@ -28,9 +28,15 @@ bool MainScene::init(){
 	
 	/*加载地图*/
 	this->map = MapScene::create();
+
+	//this->map->setPosition(10, 10);
+
 	this->map->step = 1;
 	this->addChild(map, 1);
 	
+	log("map.position = (%f , %f)", map->getPositionX(), map->getPositionY());
+
+
 	/*创建退出按钮*/
 	/*auto exitButton = MenuItemSprite::create(
 		Sprite::createWithSpriteFrameName("exit.png"),
@@ -104,18 +110,41 @@ bool MainScene::init(){
 		auto nodeB = contact.getShapeB()->getBody()->getNode();
 		if (nodeA&&nodeB){
 			if (nodeA->getTag() == 10){
+				//nodeB->getPhysicsBody()->removeFromWorld();
+				//nodeB->removeFromParent();
 				nodeB->removeFromParentAndCleanup(true);
 			}
 			else if (nodeB->getTag() == 10){
+				//nodeA->getPhysicsBody()->removeFromWorld();
+				//nodeA->removeFromParent();
 				nodeA->removeFromParentAndCleanup(true);
 			}
 			monster->monsterNumberDecrease();
 		}
-		arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
-		arrow->getArrowSprite()->setVisible(false);
-		if (monster->getMonsterNumber() > 0){
-			arrow->changeArrowSpriteReferTo();
-		}
+		//arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+
+		//log("contactArrowTag = %d", arrow->getArrowSprite()->getTag());
+
+		//arrow->getArrowSprite()->setTag(11);
+
+		//Point arrowPoint = arrow->getArrowSprite()->getPosition();
+
+		//log("contactArrowTag = %d", arrow->getArrowSprite()->getTag());
+		//arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+		//arrow->getArrowSprite()->removeFromParentAndCleanup(true);
+		//arrow->getArrowSprite()->stopAllActions();
+		//arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+		//arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
+		//arrow->getArrowSprite()->setVisible(false);
+		//if (monster->getMonsterNumber() > 0){
+		//	arrow->changeArrowSpriteReferTo(); 
+		//}
+
+		//arrow->getArrowSprite()->setPosition(arrowPoint);
+
+		//log("new arrowSprite position = (%f,%f)", arrow->getArrowSprite()->getPositionX(), arrow->getArrowSprite()->getPositionY());
+
+		//log("new arrowSpriteTag = %d", arrow->getArrowSprite()->getTag());
 		return true;
 	};
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
@@ -146,23 +175,32 @@ void MainScene::update(float dt){
 	/*判断箭是否碰撞到了障碍*/
 	Sprite* arrowSprite = this->arrow->getArrowSprite();
 	Point arrowPoint = arrowSprite->getPosition();
+
+	log("update new arrowSprite position = (%f,%f)", arrowPoint.x, arrowPoint.y);
+
+	log("update new ArrowSpriteTag = %d", arrowSprite->getTag());
+
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	/*飞出屏幕上方则忽略*/
 	if (arrowPoint.y < visibleSize.height&&arrowPoint.x < visibleSize.width){
 		/*将坐标转化为瓦片地图里的坐标*/
 		Size arrowSize = this->arrow->getArrowSprite()->getContentSize();
-		Size mapTiledNum = this->map->getMap()->getMapSize();
+		//Size mapTiledNum = this->map->getMap()->getMapSize();
 		Size tiledSize = this->map->getMap()->getTileSize();
 		if (arrowPoint.x + arrowSize.width / 2 < visibleSize.width){
 			int tiledPosX = (arrowPoint.x + arrowSize.width / 2) / tiledSize.width;
-			int tiledPosY = (640 - arrowPoint.y) / tiledSize.height;
+			int tiledPosY = (639-arrowPoint.y) / tiledSize.height;
+
+			log("arrwPoint.y = %f", arrowPoint.y);
+
 			Point tiledPos = Point(tiledPosX, tiledPosY);
 
 			TMXLayer* meta = this->map->getMap()->getLayer("obscatle");
 			int tiledGid = meta->getTileGIDAt(tiledPos);
 
 			if (tiledGid != 0){
-				arrowSprite->removeFromParent();//removeFromPhysicsWorld();
+				arrowSprite->getPhysicsBody()->removeFromWorld();
+				//arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 				arrowSprite->stopAllActions();
 				this->arrow->changeArrowSpriteReferTo();
 			}
@@ -174,7 +212,8 @@ void MainScene::update(float dt){
 		float burningX = this->burningbatch->getPosition().x;
 		float burningY = this->burningbatch->getPosition().y;
 		if ((arrowX+arrowSprite->getContentSize().width/2)>=8*32&&(arrowX-arrowSprite->getContentSize().width/2)<=11*32){
-			arrowSprite->removeFromParent();//removeFromPhysicsWorld();
+			//arrowSprite->getPhysicsBody()->removeFromWorld();
+			    arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 				arrowSprite->stopAllActions();
 				arrowSprite->setVisible(false);
 				this->arrow->changeArrowSpriteReferTo();

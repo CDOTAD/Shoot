@@ -86,9 +86,14 @@ bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event){
 	touchBeganTime = startPerformanceCount.QuadPart;
 	/*使箭头装箱鼠标所在位置*/
 	Point locationTouch = touch->getLocation();
+	
+	log("locationTouch.x = %f locationTouch.y= %f \n", locationTouch.x, locationTouch.y); 
+
 	Point locationArrowSprite = arrowSprite->getPosition();
 	/*计算所需转过的角度*/
 	float angel = atan((locationTouch.y - locationArrowSprite.y) / (locationTouch.x - locationArrowSprite.y)) * 180 / pi;
+
+	log("angel = %f\n", angel);
 	if (this->isflying == false){
 		if (locationTouch.x == locationArrowSprite.x&&locationTouch.y<locationArrowSprite.y){
 			auto rotateTo = RotateTo::create(0.1f, 90.0);
@@ -297,6 +302,8 @@ void ArrowSpriteLayer::onTouchEnded(Touch* touch, Event* event){
 	if (this->isflying == false){
 		arrowSprite->getPhysicsBody()->setGravityEnable(true);
 
+		
+
 		auto moveBy = MoveBy::create(1.0f, Vec2(0, 0));
 		RotateBy* rotateBy;
 		if (locationTouch.x>locationArrowSprite.x){
@@ -358,6 +365,9 @@ void ArrowSpriteLayer::changeArrowSpriteReferTo(){
 	if (spriteNum < this->ARROWNUMBER){
 		
 		arrowSprite = vecArrowSprite.at(spriteNum);
+
+		log("ArrowSpriteLayer::changeArrowSpriteReferTo arrowSpritePosition = (%f,%f)", arrowSprite->getPositionX(), arrowSprite->getPositionY());
+
 		auto physicsArrowBody = PhysicsBody::createBox(arrowSprite->getContentSize());
 		physicsArrowBody->setGravityEnable(false);
 		physicsArrowBody->setCategoryBitmask(1);
@@ -378,7 +388,9 @@ void ArrowSpriteLayer::update(float dt){
 	if (arrowSpritePosition.x > visibleSize.width || arrowSpritePosition.x < 0 || arrowSpritePosition.y<0 ){
 		if (spriteNum < this->ARROWNUMBER){
 			this->arrowSprite->setVisible(false);
-			arrowSprite->removeFromParent();//removeFromPhysicsWorld();
+			//arrowSprite->getPhysicsBody()->removeFromWorld();
+
+			arrowSprite->removeFromParentAndCleanup(true);//removeFromPhysicsWorld();
 			changeArrowSpriteReferTo();
 		}
 	}
@@ -401,6 +413,9 @@ void ArrowSpriteLayer::setArrowPosition(TMXObjectGroup* arrowObjectGroup){
 	float arrowY = arrowPointMap.at("y").asFloat();
 	for (int i = 0; i < this->ARROWNUMBER; i++){
 		Sprite* spriteArrow = this->vecArrowSprite.at(i);
+
+		
+
 		spriteArrow->setPosition(arrowX + 25, arrowY + 25);
 	}
 }

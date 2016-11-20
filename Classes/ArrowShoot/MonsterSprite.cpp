@@ -131,7 +131,11 @@ void MonsterSprite::setMonstersPosition(TMXObjectGroup* monsterObjectGroup){
 		float monsterX = monsterPointMap.at("x").asFloat();
 		float monsterY = monsterPointMap.at("y").asFloat();
 		
-		monsterSprite->setPosition(monsterX+25 , monsterY+25 );
+		log("monsterX = %f monsterY = %f", monsterX, monsterY);
+
+		
+
+		monsterSprite->setPosition(monsterX + 25, monsterY + 25);
 	}
 }
 int MonsterSprite::getMonsterNumber(){

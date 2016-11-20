@@ -80,6 +80,9 @@ bool MainStep2Scene::init(){
 			}
 			monster->monsterNumberDecrease();
 		}
+
+		//arrow->getPhysicsBody()->removeFromWorld();
+
 		arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
 		arrow->getArrowSprite()->setVisible(false);
 		if (monster->getMonsterNumber() > 0){
@@ -133,6 +136,9 @@ void MainStep2Scene::update(float dt){
 			int tiledGid = meta->getTileGIDAt(tiledPos);
 
 			if (tiledGid != 0){
+
+				//arrowSprite->getPhysicsBody()->removeFromWorld();
+
 				arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 				arrowSprite->stopAllActions();
 				this->arrow->changeArrowSpriteReferTo();

@@ -94,6 +94,9 @@ bool MainStep3Scene::init(){
 			}
 			monster->monsterNumberDecrease();
 		}
+
+		//arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+
 		arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
 		arrow->getArrowSprite()->setVisible(false);
 		if (monster->getMonsterNumber() > 0){
@@ -148,6 +151,7 @@ void MainStep3Scene::update(float dt){
 			int tiledGid = meta->getTileGIDAt(tiledPos);
 
 			if (tiledGid != 0){
+				//arrowSprite->getPhysicsBody()->removeFromWorld();
 				arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 				arrowSprite->stopAllActions();
 				this->arrow->changeArrowSpriteReferTo();
@@ -160,6 +164,7 @@ void MainStep3Scene::update(float dt){
 		float burningX = this->burningbatch->getPosition().x;
 		float burningY = this->burningbatch->getPosition().y;
 		if ((arrowX + arrowSprite->getContentSize().width / 2) >= 8 * 32 && (arrowX - arrowSprite->getContentSize().width / 2) <= 11 * 32){
+			//arrowSprite->getPhysicsBody()->removeFromWorld();
 			arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 			arrowSprite->stopAllActions();
 			arrowSprite->setVisible(false);
