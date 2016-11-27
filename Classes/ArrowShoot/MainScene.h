@@ -6,7 +6,7 @@
 #include"cocos2d.h"
 #include<windows.h>
 #include"ArrowSpriteLayer.h"
-#include"MonsterSprite.h"
+#include"MonsterSpriteLayer.h"
 #include"MapScene.h"
 #include"PauseLayer.h"
 #include"WinLayer.h"
@@ -19,6 +19,8 @@ class MainStep2Scene;
 class FailLayer;
 class ArrowSpriteLayer;
 
+
+
 class MainScene :public Layer{
 public:
 	static Scene* CreateScene();
@@ -26,7 +28,7 @@ public:
 	virtual void update(float dt);
 	void judge(float dt);
 	void Pause();
-	void setBurning(float dt);
+	virtual void setBurning(float dt);
 	void deleteBurning(float dt);
 	void menuExitCallBack(cocos2d::Ref* pSender);
 	CREATE_FUNC(MainScene);
@@ -36,7 +38,7 @@ public:
 	float scores = 0;
 public:
 	ArrowSpriteLayer * arrow;//箭头精灵层
-	MonsterSprite* monster;//怪物精灵层
+	MonsterSpriteLayer* monster;//怪物精灵层
 	MapScene* map;//瓦片地图层
 private:
 	int arrowleft = 0;

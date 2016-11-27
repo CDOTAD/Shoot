@@ -6,7 +6,7 @@
 #include"cocos2d.h"
 #include<windows.h>
 #include"ArrowSpriteLayer.h"
-#include"MonsterSprite.h"
+#include"MonsterSpriteLayer.h"
 #include"MapScene.h"
 #include"PauseLayer.h"
 #include"WinLayer.h"
@@ -36,7 +36,7 @@ public:
 	float scores = 0;
 public:
 	ArrowSpriteLayer* arrow;//箭头精灵层
-	MonsterSprite* monster;//怪物精灵层
+	MonsterSpriteLayer* monster;//怪物精灵层
 	MapScene* map;//瓦片地图层
 private:
 	int arrowleft = 0;
