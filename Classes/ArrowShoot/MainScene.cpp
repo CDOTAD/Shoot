@@ -28,7 +28,7 @@ bool MainScene::init(){
 	Director* dir = Director::getInstance();
 	Size visibleSize = dir->getVisibleSize();
 	
-	/*加载地图*/
+	/*录脫脭脴碌脴脥录*/
 	this->map = MapScene::create();
 
 	//this->map->setPosition(10, 10);
@@ -39,7 +39,7 @@ bool MainScene::init(){
 	log("map.position = (%f , %f)", map->getPositionX(), map->getPositionY());
 
 
-	/*创建退出按钮*/
+	/*麓麓陆篓脥脣鲁枚掳麓脜楼*/
 	auto exitButton = MenuItemSprite::create(
 		Sprite::createWithSpriteFrameName("exit.png"),
 		Sprite::createWithSpriteFrameName("exitOn.png"),
@@ -50,14 +50,14 @@ bool MainScene::init(){
 	menu->setPosition(visibleSize.width*0.9, 32);
 	this->addChild(menu, 2);
 
-	/*加载箭头*/
+	/*录脫脭脴录媒脥路*/
 	this->arrow = ArrowSpriteLayer::create();
 	this->arrow->step = 1;
 	this->arrow->layer1 = this;
 	arrow->setArrowPosition(this->map->getObjectGroup());
 	this->addChild(arrow,2);
 	
-	/*加载弓*/
+	/*录脫脭脴鹿颅*/
 	arch = Sprite::createWithSpriteFrameName("arch.png");
 	ValueMap archPointMap = this->map->getObjectGroup()->getObject("Heros");
 	float archX = archPointMap.at("x").asFloat();
@@ -66,12 +66,12 @@ bool MainScene::init(){
 	arch->setScale(0.7f);
 	this->addChild(arch, 1);
 
-	/*加载怪物*/
+	/*录脫脭脴鹿脰脦茂*/
 	this-> monster = MonsterSprite::create();
 	monster->setMonstersPosition(this->map->getObjectGroup());
 	this->addChild(monster, 2);
 	
-	/*创建英雄*/
+	/*麓麓陆篓脫垄脨脹*/
 	myHero = Sprite::createWithSpriteFrameName("B_huolong.png");
 	ValueMap heroPointMap = this->map->getObjectGroup()->getObject("Heros");
 	float heroX = heroPointMap.at("x").asFloat();
@@ -80,7 +80,7 @@ bool MainScene::init(){
 	myHero->setScale(0.1f);
 	this->addChild(myHero, 1);
 	
-	/*创建火焰效果*/
+	/*麓麓陆篓禄冒脩忙脨搂鹿没*/
 	ValueMap firePointMap = this->map->getObjectGroup()->getObject("Fire");
 	float fireX = firePointMap.at("x").asFloat();
 	float fireY = firePointMap.at("y").asFloat();
@@ -104,7 +104,7 @@ bool MainScene::init(){
 	burningbatch->setVisible(false);
 	this->addChild(burningbatch, 10);
 
-	/*碰撞监听器*/
+	/*脜枚脳虏录脿脤媒脝梅*/
 	auto contactListener = EventListenerPhysicsContact::create();
 	
 	contactListener->onContactBegin = [=](PhysicsContact &contact){
@@ -120,8 +120,10 @@ bool MainScene::init(){
 			else if (nodeB->getTag() == 10){
 				//nodeA->getPhysicsBody()->removeFromWorld();
 				//nodeA->removeFromParent();
+				//nodeA->getPhysicsBody()->removeFromWorld();
+				//nodeA->removeFromParentAndCleanup(true);
 				nodeA->getPhysicsBody()->removeFromWorld();
-				nodeA->removeFromParentAndCleanup(true);
+				nodeA->setVisible(false);
 			}
 			monster->monsterNumberDecrease();
 		}
@@ -142,10 +144,10 @@ bool MainScene::init(){
 
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
 	
-	/*键盘监听器*/
+	/*录眉脜脤录脿脤媒脝梅*/
 	auto listenerKeypad = EventListenerKeyboard::create();
 	listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode,Event* event){
-		/*如果按ESC键创建暂停层*/
+		/*脠莽鹿没掳麓ESC录眉麓麓陆篓脭脻脥拢虏茫*/
 		if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
 			if (this->flagPressed == false){
 				this->Pause();
@@ -165,15 +167,15 @@ bool MainScene::init(){
 
 void MainScene::update(float dt){
 	this->scores += 0.1;
-	/*判断箭是否碰撞到了障碍*/
+	/*脜脨露脧录媒脢脟路帽脜枚脳虏碌陆脕脣脮脧掳颅*/
 	Sprite* arrowSprite = this->arrow->getArrowSprite();
 	Point arrowPoint = arrowSprite->getPosition();
 
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	/*飞出屏幕上方则忽略*/
+	/*路脡鲁枚脝脕脛禄脡脧路陆脭貌潞枚脗脭*/
 	if (arrowPoint.y < visibleSize.height&&arrowPoint.x < visibleSize.width){
-		/*将坐标转化为瓦片地图里的坐标*/
+		/*陆芦脳酶卤锚脳陋禄炉脦陋脥脽脝卢碌脴脥录脌茂碌脛脳酶卤锚*/
 		Size arrowSize = this->arrow->getArrowSprite()->getContentSize();
 		//Size mapTiledNum = this->map->getMap()->getMapSize();
 		Size tiledSize = this->map->getMap()->getTileSize();
