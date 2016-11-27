@@ -53,7 +53,7 @@ bool MainStep3Scene::init(){
 	this->addChild(arch, 1);
 
 	/*¼ÓÔØ¹ÖÎï*/
-	this->monster = MonsterSprite::create();
+	this->monster = MonsterSpriteLayer::create();
 	monster->setMonstersPosition(this->map->getObjectGroup());
 	this->addChild(monster, 2);
 
