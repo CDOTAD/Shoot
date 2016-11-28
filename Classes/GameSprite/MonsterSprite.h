@@ -13,6 +13,9 @@ public:
 
 public:
 	Action* runAction(Action* action);
+	void onContact();
+	PhysicsBody* getPhysicsBody();
+	virtual void setPhysicsBody();
 };
 
 

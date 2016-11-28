@@ -6,6 +6,7 @@ ArmSprite::ArmSprite()
 
 ArmSprite::ArmSprite(Sprite * sprite)
 {
+	this->_sprite = sprite;
 }
 
 ArmSprite::~ArmSprite()
