@@ -11,6 +11,18 @@ public:
 	ArrowSprite();
 	~ArrowSprite();
 
+public:
+	bool isFly();
+	void setPhysicsBody();
+	Action* runAction(Action* action);
+	void onContact();
+	Vec2 getSpeed();
+	PhysicsBody* getPhysicsBody();
+
+private:
+	bool _isFly;
+	Vec2 _speed;
+
 };
 
 

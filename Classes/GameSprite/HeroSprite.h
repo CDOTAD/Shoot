@@ -15,14 +15,22 @@ public:
 	void bingSprite(Sprite* sprite);
 
 public:
-	Sprite* getSprite();
 	void setPosition(float x, float y);
 	const Vec2& getPosition() const;
+	PhysicsBody* getPhysicsBody();
+	void setTag(int tag);
+	void setVisible(bool visible);
+	Size getContentSize();
+	virtual void setPhysicsBody();
+
+	
+
 
 
 	
-private:
+protected:
 	Sprite* _sprite;
+	PhysicsBody* _physicsBody;
 
 };
 
