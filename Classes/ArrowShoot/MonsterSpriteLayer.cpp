@@ -160,6 +160,9 @@ void MonsterSpriteLayer::update(float dt){
 
 	if (this->monsterNumber == 0)
 	{
+		this->unscheduleUpdate();
 		_observer->onEventHappen(this, NoMonster);
+
+		
 	}
 }
