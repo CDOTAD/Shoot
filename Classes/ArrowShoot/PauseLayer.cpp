@@ -50,32 +50,32 @@ bool PauseLayer::init(){
 }
 
 void PauseLayer::menuResumeCallBack(Ref* pSender){
-	if (this->mainPlayLayer != NULL){
-		this->mainPlayLayer->flagPressed = false;
-		if (this->mainPlayLayer->arrow->isflying == true){
-			this->mainPlayLayer->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(this->mainPlayLayer->getSpeed());
-			this->mainPlayLayer->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(true);
-		}
-		this->removeFromParentAndCleanup(true);
-		Director::getInstance()->resume();
+	//if (this->mainPlayLayer != NULL){
+	//	/*this->mainPlayLayer->flagPressed = false;
+	//	if (this->mainPlayLayer->arrow->isflying == true){
+	//		this->mainPlayLayer->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(this->mainPlayLayer->getSpeed());
+	//		this->mainPlayLayer->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(true);
+	//	}
+	//	this->removeFromParentAndCleanup(true);
+	//	Director::getInstance()->resume();*/
 
-	}
-	else if (this->mainStep2Layer != NULL){
-		this->mainStep2Layer->flagPressed = false;
-		if (this->mainStep2Layer->arrow->isflying == true){
-			this->mainStep2Layer->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(this->mainStep2Layer->getSpeed());
-			this->mainStep2Layer->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(true);
-		}
-		this->removeFromParentAndCleanup(true);
-		Director::getInstance()->resume();
-	}
-	else if (this->mainStep3Layer != NULL){
-		this->mainStep2Layer->flagPressed = false;
-		if (this->mainStep3Layer->arrow->isflying == true){
-			this->mainStep3Layer->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(this->mainStep3Layer->getSpeed());
-			this->mainStep3Layer->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(true);		
-		}	
-	}
+	//}
+	//else if (this->mainStep2Layer != NULL){
+	//	this->mainStep2Layer->flagPressed = false;
+	//	if (this->mainStep2Layer->arrow->isflying == true){
+	//		this->mainStep2Layer->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(this->mainStep2Layer->getSpeed());
+	//		this->mainStep2Layer->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(true);
+	//	}
+	//	this->removeFromParentAndCleanup(true);
+	//	Director::getInstance()->resume();
+	//}
+	//else if (this->mainStep3Layer != NULL){
+	//	this->mainStep2Layer->flagPressed = false;
+	//	if (this->mainStep3Layer->arrow->isflying == true){
+	//		this->mainStep3Layer->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(this->mainStep3Layer->getSpeed());
+	//		this->mainStep3Layer->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(true);		
+	//	}	
+	//}
 }
 
 void PauseLayer::menuAgainCallBack(Ref* pSender){

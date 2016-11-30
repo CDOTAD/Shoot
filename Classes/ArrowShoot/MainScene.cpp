@@ -1,42 +1,45 @@
 #include"MainScene.h"
 #include"FirstScene.h"
 #include"MainStep2Scene.h"
+#include"ArrowSpriteStep1Layer.h"
+
 
 
 Scene* MainScene::CreateScene(){
 	auto scene = Scene::createWithPhysics();
-
+	scene->setTag(123321);
 	scene->getPhysicsWorld()->setGravity(Vect(0, -980));
 	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 
 	auto layer = MainScene::create();
+
 	scene->addChild(layer);
 	
 	return scene;
 }
 
 bool MainScene::init(){
-	if (!Layer::create()){
+	if (!GameLayer::create()){
 		return false;
 	}
 
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("AS_Zombie.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("B_Figure.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Pictures.plist");
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("AS_Zombie.plist");
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("B_Figure.plist");
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Pictures.plist");
 
 
 	Director* dir = Director::getInstance();
 	Size visibleSize = dir->getVisibleSize();
 	
 	/*加载地图*/
-	this->map = MapScene::create();
+	this->_mapLayer = MapLayer::create();
 
 	//this->map->setPosition(10, 10);
 
-	this->map->step = 1;
-	this->addChild(map, 1);
+	this->_mapLayer->step = 1;
+	this->addChild(_mapLayer, 1);
 	
-	log("map.position = (%f , %f)", map->getPositionX(), map->getPositionY());
+	//log("map.position = (%f , %f)", map->getPositionX(), map->getPositionY());
 
 
 	/*创建退出按钮*/
@@ -51,15 +54,15 @@ bool MainScene::init(){
 	this->addChild(menu, 2);
 
 	/*加载箭头*/
-	this->arrow = ArrowSpriteLayer::create();
-	this->arrow->step = 1;
-	this->arrow->layer1 = this;
-	arrow->setArrowPosition(this->map->getObjectGroup());
-	this->addChild(arrow,2);
+	this->_arrowLayer = ArrowSpriteStep1Layer::create();
+	//this->_arrowLayer->step = 1;
+	this->_arrowLayer->addObserver(this);
+	_arrowLayer->setArrowPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_arrowLayer,2);
 	
 	/*加载弓*/
 	arch = Sprite::createWithSpriteFrameName("arch.png");
-	ValueMap archPointMap = this->map->getObjectGroup()->getObject("Heros");
+	ValueMap archPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
 	float archX = archPointMap.at("x").asFloat();
 	float archY = archPointMap.at("y").asFloat();
 	arch->setPosition(archX + 20 , archY + 30);
@@ -67,13 +70,14 @@ bool MainScene::init(){
 	this->addChild(arch, 1);
 
 	/*加载怪物*/
-	this-> monster = MonsterSpriteLayer::create();
-	monster->setMonstersPosition(this->map->getObjectGroup());
-	this->addChild(monster, 2);
+	this-> _monsterLayer = MonsterSpriteLayer::create();
+	this->_monsterLayer->addObserver(this);
+	_monsterLayer->setMonstersPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_monsterLayer, 2);
 	
 	/*创建英雄*/
 	myHero = Sprite::createWithSpriteFrameName("B_huolong.png");
-	ValueMap heroPointMap = this->map->getObjectGroup()->getObject("Heros");
+	ValueMap heroPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
 	float heroX = heroPointMap.at("x").asFloat();
 	float heroY = heroPointMap.at("y").asFloat();
 	myHero->setPosition(heroX + 25-64, heroY + 50);
@@ -81,7 +85,7 @@ bool MainScene::init(){
 	this->addChild(myHero, 1);
 	
 	/*创建火焰效果*/
-	ValueMap firePointMap = this->map->getObjectGroup()->getObject("Fire");
+	ValueMap firePointMap = this->_mapLayer->getObjectGroup()->getObject("Fire");
 	float fireX = firePointMap.at("x").asFloat();
 	float fireY = firePointMap.at("y").asFloat();
 	ParticleSystemQuad* fire = ParticleSystemQuad::create("fire1.plist");
@@ -92,7 +96,7 @@ bool MainScene::init(){
 	fire->release();
 	this->addChild(batch, 10);
 
-	ValueMap burningfirePointMap = this->map->getObjectGroup()->getObject("BurningFire");
+	ValueMap burningfirePointMap = this->_mapLayer->getObjectGroup()->getObject("BurningFire");
 	float burningfireX = burningfirePointMap.at("x").asFloat();
 	float burningfireY = burningfirePointMap.at("y").asFloat();
 	ParticleSystemQuad* burningfire = ParticleSystemQuad::create("burning.plist");
@@ -105,9 +109,9 @@ bool MainScene::init(){
 	this->addChild(burningbatch, 10);
 
 	/*碰撞监听器*/
-	auto contactListener = EventListenerPhysicsContact::create();
+	_contactListener = EventListenerPhysicsContact::create();
 	
-	contactListener->onContactBegin = [=](PhysicsContact &contact){
+	_contactListener->onContactBegin = [=](PhysicsContact &contact){
 		auto nodeA = contact.getShapeA()->getBody()->getNode();
 		auto nodeB = contact.getShapeB()->getBody()->getNode();
 		if (nodeA&&nodeB){
@@ -131,33 +135,35 @@ bool MainScene::init(){
 				nodeA->getPhysicsBody()->removeFromWorld();
 				nodeA->setVisible(false);
 			}
-			monster->monsterNumberDecrease();
+			_monsterLayer->monsterNumberDecrease();
 		}
 
 
 		return true;
 	};
 
-	contactListener->onContactSeparate = [=](PhysicsContact &contact) {
+	_contactListener->onContactSeparate = [=](PhysicsContact &contact) {
 
-		this->arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
-		
-		this->arrow->getArrowSprite()->setVisible(false);
-		if (monster->getMonsterNumber() > 0) {
-			this->arrow->changeArrowSpriteReferTo();
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+		/*this->getScene()->getPhysicsWorld()->removeBody(_arrowLayer->getArrowSprite()->getPhysicsBody());
+		log("%d", this->getScene()->getTag());*/
+		this->_arrowLayer->getArrowSprite()->setVisible(false);
+		if (_monsterLayer->getMonsterNumber() > 0) {
+			this->_arrowLayer->changeArrowSpriteReferTo();
+			this->_arrowLayer->updateLabel(_arrowLayer);
 		}	
 	};
 
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_contactListener, this);
 	
 	/*键盘监听器*/
 	auto listenerKeypad = EventListenerKeyboard::create();
 	listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode,Event* event){
 		/*如果按ESC键创建暂停层*/
 		if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
-			if (this->flagPressed == false){
+			if (this->_flagPressed == false){
 				this->Pause();
-				this->flagPressed = true;
+				this->_flagPressed = true;
 			}
 			
 		}
@@ -166,15 +172,16 @@ bool MainScene::init(){
 	
 	this->scheduleUpdate();
 
-	this->schedule(schedule_selector(MainScene::judge), 3.0f, kRepeatForever,0.0f);
+	//this->schedule(schedule_selector(MainScene::judge), 3.0f, kRepeatForever,0.0f);
 	this->schedule(schedule_selector(MainScene::setBurning), 10.0f, kRepeatForever,0.0f);
 	return true;
 }
 
+
 void MainScene::update(float dt){
 	this->scores += 0.1;
 	/*判断箭是否碰撞到了障碍*/
-	Sprite* arrowSprite = this->arrow->getArrowSprite();
+	Sprite* arrowSprite = this->_arrowLayer->getArrowSprite();
 	Point arrowPoint = arrowSprite->getPosition();
 
 
@@ -182,9 +189,9 @@ void MainScene::update(float dt){
 	/*飞出屏幕上方则忽略*/
 	if (arrowPoint.y < visibleSize.height&&arrowPoint.x < visibleSize.width){
 		/*将坐标转化为瓦片地图里的坐标*/
-		Size arrowSize = this->arrow->getArrowSprite()->getContentSize();
+		Size arrowSize = this->_arrowLayer->getArrowSprite()->getContentSize();
 		//Size mapTiledNum = this->map->getMap()->getMapSize();
-		Size tiledSize = this->map->getMap()->getTileSize();
+		Size tiledSize = this->_mapLayer->getMap()->getTileSize();
 		if (arrowPoint.x + arrowSize.width / 2 < visibleSize.width){
 			int tiledPosX = (arrowPoint.x + arrowSize.width /2) / tiledSize.width;
 			int tiledPosY = (639 - arrowPoint.y) / tiledSize.height;
@@ -193,18 +200,22 @@ void MainScene::update(float dt){
 
 			Point tiledPos = Point(tiledPosX, tiledPosY);
 
-			TMXLayer* meta = this->map->getMap()->getLayer("obscatle");
+			TMXLayer* meta = this->_mapLayer->getMap()->getLayer("obscatle");
 			int tiledGid = meta->getTileGIDAt(tiledPos);
 
 			if (tiledGid != 0){
 				arrowSprite->getPhysicsBody()->removeFromWorld();
+				//arrowSprite->removeFromParentAndCleanup(true);
 				//arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 				arrowSprite->stopAllActions();
-				this->arrow->changeArrowSpriteReferTo();
+				
+				this->_arrowLayer->changeArrowSpriteReferTo();
+				
+				this->_arrowLayer->updateLabel(_arrowLayer);
 			}
 		}
 	}
-	if (this->flagBurning == true){
+	if (this->_flagBurning == true){
 		float arrowX = arrowPoint.x;
 		float arrowY = arrowPoint.y;
 		float burningX = this->burningbatch->getPosition().x;
@@ -214,25 +225,28 @@ void MainScene::update(float dt){
 			    arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 				arrowSprite->stopAllActions();
 				arrowSprite->setVisible(false);
-				this->arrow->changeArrowSpriteReferTo();
+				
+				this->_arrowLayer->changeArrowSpriteReferTo();
+				
+				this->_arrowLayer->updateLabel(_arrowLayer);
 		}
 	}
 }
 
 void MainScene::judge(float dt){
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	if (this->arrow->getArrowSpriteNumber() >= 0 && this->monster->getMonsterNumber() == 0){		
-		float score = MAX_SCORES+4 * this->arrow->getArrowSpriteNumber() - 8 * this->monster->getMonsterNumber()-0.01*this->scores;
-		this->arrow->step = 2;
-		this->map->step = 2;
-		this->monster->step = 2;
+	if (this->_arrowLayer->getArrowSpriteNumber() >= 0 && this->_monsterLayer->getMonsterNumber() == 0){		
+		float score = MAX_SCORES+4 * this->_arrowLayer->getArrowSpriteNumber() - 8 * this->_monsterLayer->getMonsterNumber()-0.01*this->scores;
+		//this->_arrowLayer->step = 2;
+		this->_mapLayer->step = 2;
+		this->_monsterLayer->step = 2;
 		auto step2 = MainStep2Scene::create();
 		step2->Scores = 0.2*score;
 		Director::getInstance()->replaceScene(
 			TransitionSplitRows::create(3.0f, MainStep2Scene::CreateScene()));
 	}
-	if (this->arrow->getArrowSpriteNumber() <= 0 && this->monster->getMonsterNumber() > 0){
-		float score = MAX_SCORES-20 * this->monster->getMonsterNumber()-0.1*this->scores;
+	if (this->_arrowLayer->getArrowSpriteNumber() <= 0 && this->_monsterLayer->getMonsterNumber() > 0){
+		float score = MAX_SCORES-20 * this->_monsterLayer->getMonsterNumber()-0.1*this->scores;
 		int scorefinal = (int)(0.2*score);
 		char finalscore[20];
 		sprintf(finalscore, "%d", scorefinal);
@@ -249,21 +263,73 @@ void MainScene::judge(float dt){
 
 void MainScene::setBurning(float dt){
 	this->burningbatch->setVisible(true);
-	this->flagBurning = true;
+	this->_flagBurning = true;
 	this->scheduleOnce(schedule_selector(MainScene::deleteBurning), 3.0f);
 }
 
 void MainScene::deleteBurning(float dt){
 	this->burningbatch->setVisible(false);
-	this->flagBurning = false;
+	this->_flagBurning = false;
+}
+
+void MainScene::onEventHappen(Layer * object, MyEvent e)
+{
+
+	switch (e)
+	{
+	case NoArrow: {
+		break;
+	}
+	case NoMonster: {
+
+		float score = MAX_SCORES + 4 * this->_arrowLayer->getArrowSpriteNumber() - 8 * this->_monsterLayer->getMonsterNumber() - 0.01*this->scores;
+		//this->_arrowLayer->step = 2;
+		this->_mapLayer->step = 2;
+		this->_monsterLayer->step = 2;
+		auto step2 = MainStep2Scene::create();
+		/*step2->Scores = 0.2*score;*/
+		Director::getInstance()->replaceScene(
+			TransitionSplitRows::create(3.0f, MainStep2Scene::CreateScene()));
+
+		break;
+	
+	}
+	case ArrowRotate: {
+		float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
+		this->arch->setRotation(angle);
+		break;
+	}
+	case Contact: {
+		if (MONSTER_LAYER_TAG == object->getTag())
+		{
+			this->_monsterNumber--;
+		}
+		else
+		{
+			this->_arrowNumber--;
+		}
+		break;
+	}
+	case ArrowOut: {
+		this->_arrowNumber--;
+
+		this->_arrowLayer->updateLabel(_arrowLayer);
+
+		break;
+	}
+	default:
+		break;
+	}
+
+	
 }
 
 void MainScene::Pause(){
 	Director::getInstance()->pause();
-	if (this->arrow->isflying == true){
-		speed = this->arrow->getArrowSprite()->getPhysicsBody()->getVelocity();
-		this->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
-		this->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
+	if (this->_arrowLayer->isflying == true){
+		speed = this->_arrowLayer->getArrowSprite()->getPhysicsBody()->getVelocity();
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
 	}
 	//this->pauseSchedulerAndActions();
 	this->pauselayer = PauseLayer::create();

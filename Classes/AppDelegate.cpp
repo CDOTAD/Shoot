@@ -1,6 +1,6 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
-#include"ArrowShoot\MainScene.h"
+#include"ArrowShoot\FailLayer.h"
 
 USING_NS_CC;
 
@@ -57,7 +57,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
-    auto scene = MainScene::CreateScene();
+    //auto scene = MainScene::CreateScene();
+	auto scene =FirstScene::CreateScene();
 
     // run
     director->runWithScene(scene);

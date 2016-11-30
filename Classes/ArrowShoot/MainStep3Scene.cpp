@@ -1,4 +1,5 @@
 #include"MainStep3Scene.h"
+#include"ArrowSpriteStep3Layer.h"
 
 float MainStep3Scene::Scores = 0;
 
@@ -22,8 +23,8 @@ bool MainStep3Scene::init(){
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 
 	/*加载地图*/
-	this->map = MapScene::create();
-	this->addChild(map, 1);
+	this->_mapLayer = MapLayer::create();
+	this->addChild(_mapLayer, 1);
 
 
 	/*创建退出按钮*/
@@ -38,14 +39,14 @@ bool MainStep3Scene::init(){
 	this->addChild(menu, 2);
 
 	/*加载箭头*/
-	this->arrow = ArrowSpriteLayer::create();
-	this->arrow->layer3 = this;
-	arrow->setArrowPosition(this->map->getObjectGroup());
-	this->addChild(arrow, 2);
+	this->_arrowLayer = ArrowSpriteStep3Layer::create();
+	this->_arrowLayer->addObserver(this);
+	_arrowLayer->setArrowPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_arrowLayer, 2);
 
 	/*加载弓*/
 	arch = Sprite::createWithSpriteFrameName("arch.png");
-	ValueMap archPointMap = this->map->getObjectGroup()->getObject("Heros");
+	ValueMap archPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
 	float archX = archPointMap.at("x").asFloat();
 	float archY = archPointMap.at("y").asFloat();
 	arch->setPosition(archX + 20, archY + 30);
@@ -53,13 +54,14 @@ bool MainStep3Scene::init(){
 	this->addChild(arch, 1);
 
 	/*加载怪物*/
-	this->monster = MonsterSpriteLayer::create();
-	monster->setMonstersPosition(this->map->getObjectGroup());
-	this->addChild(monster, 2);
+	this->_monsterLayer = MonsterSpriteLayer::create();
+	this->_monsterLayer->addObserver(this);
+	_monsterLayer->setMonstersPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_monsterLayer, 2);
 
 	/*创建英雄*/
 	myHero = Sprite::createWithSpriteFrameName("B_sensen.png");
-	ValueMap heroPointMap = this->map->getObjectGroup()->getObject("Heros");
+	ValueMap heroPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
 	float heroX = heroPointMap.at("x").asFloat();
 	float heroY = heroPointMap.at("y").asFloat();
 	myHero->setPosition(heroX + 25-64, heroY + 50);
@@ -68,7 +70,7 @@ bool MainStep3Scene::init(){
 
 	/*创建火焰效果*/
 
-	ValueMap burningfirePointMap = this->map->getObjectGroup()->getObject("BurningFire");
+	ValueMap burningfirePointMap = this->_mapLayer->getObjectGroup()->getObject("BurningFire");
 	float burningfireX = burningfirePointMap.at("x").asFloat();
 	float burningfireY = burningfirePointMap.at("y").asFloat();
 	ParticleSystemQuad* burningfire = ParticleSystemQuad::create("burning.plist");
@@ -81,8 +83,8 @@ bool MainStep3Scene::init(){
 	this->addChild(burningbatch, 10);
 
 	/*碰撞监听器*/
-	auto contactListener = EventListenerPhysicsContact::create();
-	contactListener->onContactBegin = [=](PhysicsContact &contact){
+	_contactListener = EventListenerPhysicsContact::create();
+	_contactListener->onContactBegin = [=](PhysicsContact &contact){
 		auto nodeA = contact.getShapeA()->getBody()->getNode();
 		auto nodeB = contact.getShapeB()->getBody()->getNode();
 		if (nodeA&&nodeB){
@@ -95,7 +97,7 @@ bool MainStep3Scene::init(){
 				nodeA->getPhysicsBody()->removeFromWorld();
 				nodeA->removeFromParentAndCleanup(true);
 			}
-			monster->monsterNumberDecrease();
+			_monsterLayer->monsterNumberDecrease();
 		}
 
 		//arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
@@ -108,23 +110,26 @@ bool MainStep3Scene::init(){
 		return true;
 	};
 
-	contactListener->onContactSeparate = [=](PhysicsContact &contact) {
-		this->arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+	_contactListener->onContactSeparate = [=](PhysicsContact &contact) {
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->removeFromWorld();
 
-		this->arrow->getArrowSprite()->setVisible(false);
-		this->arrow->changeArrowSpriteReferTo();
+		this->_arrowLayer->getArrowSprite()->setVisible(false);
+		if (_monsterLayer->getMonsterNumber() > 0) {
+			this->_arrowLayer->changeArrowSpriteReferTo();
+			this->_arrowLayer->updateLabel(_arrowLayer);
+		}
 	};
 
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_contactListener, this);
 
 	/*键盘监听器*/
 	auto listenerKeypad = EventListenerKeyboard::create();
 	listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event){
 		/*如果按ESC键创建暂停层*/
 		if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
-			if (this->flagPressed == false){
+			if (this->_flagPressed == false){
 				this->Pause();
-				this->flagPressed = true;
+				this->_flagPressed = true;
 			}
 
 		}
@@ -133,7 +138,7 @@ bool MainStep3Scene::init(){
 
 	this->scheduleUpdate();
 
-	this->schedule(schedule_selector(MainStep3Scene::judge), 3.0f, kRepeatForever, 0.0f);
+	//this->schedule(schedule_selector(MainStep3Scene::judge), 3.0f, kRepeatForever, 0.0f);
 	this->schedule(schedule_selector(MainStep3Scene::setBurning), 6.0f, kRepeatForever, 0.0f);
 
 	return true;
@@ -143,33 +148,36 @@ bool MainStep3Scene::init(){
 void MainStep3Scene::update(float dt){
 	this->scores += 0.1;
 	/*判断箭是否碰撞到了障碍*/
-	Sprite* arrowSprite = this->arrow->getArrowSprite();
+	Sprite* arrowSprite = this->_arrowLayer->getArrowSprite();
 	Point arrowPoint = arrowSprite->getPosition();
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	/*飞出屏幕上方则忽略*/
 	if (arrowPoint.y < visibleSize.height){
 		/*将坐标转化为瓦片地图里的坐标*/
-		Size arrowSize = this->arrow->getArrowSprite()->getContentSize();
-		Size mapTiledNum = this->map->getMap()->getMapSize();
-		Size tiledSize = this->map->getMap()->getTileSize();
+		Size arrowSize = this->_arrowLayer->getArrowSprite()->getContentSize();
+		Size mapTiledNum = this->_mapLayer->getMap()->getMapSize();
+		Size tiledSize = this->_mapLayer->getMap()->getTileSize();
 		if (arrowPoint.x + arrowSize.width / 2 < visibleSize.width){
 			int tiledPosX = (arrowPoint.x + arrowSize.width / 2) / tiledSize.width;
 			int tiledPosY = (640 - arrowPoint.y) / tiledSize.height;
 
 			Point tiledPos = Point(tiledPosX, tiledPosY);
 
-			TMXLayer* meta = this->map->getMap()->getLayer("obscatle");
+			TMXLayer* meta = this->_mapLayer->getMap()->getLayer("obscatle");
 			int tiledGid = meta->getTileGIDAt(tiledPos);
 
 			if (tiledGid != 0){
 				arrowSprite->getPhysicsBody()->removeFromWorld();
 				//arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 				arrowSprite->stopAllActions();
-				this->arrow->changeArrowSpriteReferTo();
+				
+				this->_arrowLayer->changeArrowSpriteReferTo();
+				
+				this->_arrowLayer->updateLabel(_arrowLayer);
 			}
 		}
 	}
-	if (this->flagBurning == true){
+	if (this->_flagBurning == true){
 		float arrowX = arrowPoint.x;
 		float arrowY = arrowPoint.y;
 		float burningX = this->burningbatch->getPosition().x;
@@ -179,7 +187,10 @@ void MainStep3Scene::update(float dt){
 			arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 			arrowSprite->stopAllActions();
 			arrowSprite->setVisible(false);
-			this->arrow->changeArrowSpriteReferTo();
+			
+			this->_arrowLayer->changeArrowSpriteReferTo();
+			
+			this->_arrowLayer->updateLabel(_arrowLayer);
 		}
 	}
 
@@ -187,8 +198,8 @@ void MainStep3Scene::update(float dt){
 
 void MainStep3Scene::judge(float dt){
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	if (this->arrow->getArrowSpriteNumber() >= 0 && this->monster->getMonsterNumber() == 0){
-		float score = MAX_SCORES + 4 * this->arrow->getArrowSpriteNumber() - 8 * this->monster->getMonsterNumber() - 0.01*this->scores;
+	if (this->_arrowLayer->getArrowSpriteNumber() >= 0 && this->_monsterLayer->getMonsterNumber() == 0){
+		float score = MAX_SCORES + 4 * this->_arrowLayer->getArrowSpriteNumber() - 8 * this->_monsterLayer->getMonsterNumber() - 0.01*this->scores;
 		int scorefinal =(int) (0.5*score + this->Scores);
 		char finalscore[20];
 		sprintf(finalscore, "%d", scorefinal);
@@ -199,8 +210,8 @@ void MainStep3Scene::judge(float dt){
 		this->addChild(winlayer, 20);
 		this->addChild(scorelabel, 21);
 	}
-	if (this->arrow->getArrowSpriteNumber() <= 0 && this->monster->getMonsterNumber() > 0){
-		float score = MAX_SCORES - 20 * this->monster->getMonsterNumber() - 0.1*this->scores;
+	if (this->_arrowLayer->getArrowSpriteNumber() <= 0 && this->_monsterLayer->getMonsterNumber() > 0){
+		float score = MAX_SCORES - 20 * this->_monsterLayer->getMonsterNumber() - 0.1*this->scores;
 		int scorefinal = (int)(0.5*score + this->Scores);
 		char finalscore[20];
 		sprintf(finalscore, "%d", scorefinal);
@@ -217,13 +228,55 @@ void MainStep3Scene::judge(float dt){
 
 void MainStep3Scene::setBurning(float dt){
 	this->burningbatch->setVisible(true);
-	this->flagBurning = true;
+	this->_flagBurning = true;
 	this->scheduleOnce(schedule_selector(MainStep3Scene::deleteBurning), 1.5f);
+}
+
+void MainStep3Scene::onEventHappen(Layer * object, MyEvent e)
+{
+	switch (e)
+	{
+	case NoArrow: {
+		break;
+	}
+	case NoMonster: {
+
+		Director::getInstance()->pause();
+		this->winlayer = WinLayer::create();
+		this->addChild(winlayer, 20);
+
+		break;
+
+	}
+	case ArrowRotate: {
+		float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
+		this->arch->setRotation(angle);
+		break;
+	}
+	case Contact: {
+		if (MONSTER_LAYER_TAG == object->getTag())
+		{
+			this->_monsterNumber--;
+		}
+		else
+		{
+			this->_arrowNumber--;
+		}
+		break;
+	}
+	case ArrowOut: {
+		this->_arrowNumber--;
+		this->_arrowLayer->updateLabel(_arrowLayer);
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 void MainStep3Scene::deleteBurning(float dt){
 	this->burningbatch->setVisible(false);
-	this->flagBurning = false;
+	this->_flagBurning = false;
 }
 
 Vec2 MainStep3Scene::getSpeed(){
@@ -232,10 +285,10 @@ Vec2 MainStep3Scene::getSpeed(){
 
 void MainStep3Scene::Pause(){
 	Director::getInstance()->pause();
-	if (this->arrow->isflying == true){
-		speed = this->arrow->getArrowSprite()->getPhysicsBody()->getVelocity();
-		this->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
-		this->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
+	if (this->_arrowLayer->isflying == true){
+		speed = this->_arrowLayer->getArrowSprite()->getPhysicsBody()->getVelocity();
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
 	}
 	//this->pauseSchedulerAndActions();
 	this->pauselayer = PauseLayer::create();

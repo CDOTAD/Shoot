@@ -1,15 +1,9 @@
-#include"MapScene.h"
+#include"MapLayer.h"
 
-int MapScene::step = 1;
+int MapLayer::step = 1;
 
-Scene* MapScene::CreateScene(){
-	auto scene = Scene::create();
-	auto layer = MapScene::create();
-	scene->addChild(layer);
-	return scene;
-}
 
-bool MapScene::init(){
+bool MapLayer::init(){
 	if (!Layer::create()){
 		return false;
 	}
@@ -56,10 +50,10 @@ bool MapScene::init(){
 	return true;
 }
 
-TMXObjectGroup* MapScene::getObjectGroup(){
+TMXObjectGroup* MapLayer::getObjectGroup(){
 	return this->objGroup;
 }
 
-TMXTiledMap* MapScene::getMap(){
+TMXTiledMap* MapLayer::getMap(){
 	return this->map;
 }

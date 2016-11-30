@@ -1,6 +1,8 @@
 #include"FailLayer.h"
 #include"FirstScene.h"
-#include"MainScene.h"
+#include "MainScene.h"
+#include "MainStep2Scene.h"
+#include "MainStep3Scene.h"
 //#include "SceneMComplete.h"
 
 Scene* FailLayer::CreateScene(){

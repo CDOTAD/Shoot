@@ -5,21 +5,19 @@
 
 
 #include"cocos2d.h"
-#include "MainScene.h"
-#include "MainStep2Scene.h"
-#include "MainStep3Scene.h"
+#include"Observer.h"
+
 
 using namespace cocos2d;
 
-class MainScene;
-class MainStep2Scene;
-class MainStep3Scene;
+//class MainScene;
+//class MainStep2Scene;
+//class MainStep3Scene;
 
 class ArrowSpriteLayer :public Layer
 {
 public:
-	static ArrowSpriteLayer* createArrow();
-	bool init();
+	virtual bool init()=0;
 	/*触摸监听函数*/
 	bool onTouchBegan(Touch* touch, Event* event);
 	void onTouchEnded(Touch* touch, Event* event);
@@ -33,23 +31,37 @@ public:
 	void changeArrowSpriteReferTo();
 	/*设置时针频率*/
 	void setTimeFrequency();
-	void update(float dt);
+
+	void setListener(ArrowSpriteLayer* layer);
+
+	void setLabel(ArrowSpriteLayer* layer);
+
+	void setArroSprite(ArrowSpriteLayer* layer);
+
+	virtual void update(float dt);
+
+	void updateLabel(ArrowSpriteLayer* layer);
+
 	/*获得箭头的剩余个数*/
 	int getArrowSpriteNumber();
-	CREATE_FUNC(ArrowSpriteLayer);
+	void addObserver(Observer* observer);
+	//CREATE_FUNC(ArrowSpriteLayer);
 public:
 	bool isflying = false;
 	float scores = 0;
-	static  int step;
 
-	MainScene* layer1;
+	
+	/*MainScene* layer1;
 	MainStep2Scene* layer2;
-	MainStep3Scene* layer3;
-private:
-	/*箭头精灵*/
-	Sprite* arrowSprite;
+	MainStep3Scene* layer3;*/
+protected:
 
-	int spriteNum = 0;
+	Observer* _observer;
+
+	/*箭头精灵*/
+	Sprite* _arrowSprite;
+
+	int spriteNum;
 
 	LabelTTF* labelArrowNumLeft;
 
@@ -64,7 +76,10 @@ private:
 
 	char name[20];
 	/*用于存放箭头精灵的容器*/
-	Vector<Sprite*> vecArrowSprite;
+
+	Vector<Sprite*> _vecArrowSprite;
+
+	//Vector<Sprite*> vecArrowSprite;
 };
 
 

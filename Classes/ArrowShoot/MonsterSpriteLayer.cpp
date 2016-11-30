@@ -1,5 +1,5 @@
 #include"MonsterSpriteLayer.h"
-#include"MapScene.h"
+#include"MapLayer.h"
 
 int MonsterSpriteLayer::step = 1;
 
@@ -10,14 +10,6 @@ float timerand(int i){
 }
 
 
-
-
-MonsterSpriteLayer *MonsterSpriteLayer::createMonster()
-{
-	auto monster = MonsterSpriteLayer::create();
-
-	return monster;
-}
 
 bool MonsterSpriteLayer::init(){
 	if (!Layer::create()){
@@ -145,14 +137,29 @@ int MonsterSpriteLayer::getMonsterNumber(){
 	return monsterNumber;
 }
 
+void MonsterSpriteLayer::onContact()
+{
+	this->monsterNumber--;
+}
+
+void MonsterSpriteLayer::addObserver(Observer * observer)
+{
+	_observer = observer;
+}
+
 void MonsterSpriteLayer::update(float dt){
 	/*更新怪物计数图标*/
-	Size visibleSize = Director::getInstance()->getVisibleSize();
+	/*Size visibleSize = Director::getInstance()->getVisibleSize();
 	this->labelMonsterNumLeft->removeFromParentAndCleanup(true);
 	char num[20];
 	sprintf(num, "%d", monsterNumber);
 	this->labelMonsterNumLeft = LabelTTF::create(num, "Brush Script MT", 32);
 	labelMonsterNumLeft->setColor(Color3B(225, 225, 225));
 	labelMonsterNumLeft->setPosition(visibleSize.width - 25, visibleSize.height - 25);
-	this->addChild(labelMonsterNumLeft, 1);
+	this->addChild(labelMonsterNumLeft, 1);*/
+
+	if (this->monsterNumber == 0)
+	{
+		_observer->onEventHappen(this, NoMonster);
+	}
 }
