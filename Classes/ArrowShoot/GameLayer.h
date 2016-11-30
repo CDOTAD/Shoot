@@ -22,6 +22,20 @@ public:
 	void menuExitCallBack(cocos2d::Ref* pSender);
 	
 protected:
+
+	void setMap(MapLayer* mapLayer,int step);
+
+	void setCommonPart();
+
+	void setArrowLayer(ArrowSpriteLayer* arrowLayer);
+
+	void setMonsterLayer(MonsterSpriteLayer* monsterLayer, int step);
+
+	void setHero(Sprite* myHero);
+
+	void setListener();
+
+protected:
 	bool _flagBurning = false;
 	bool _flagPressed = false;
 

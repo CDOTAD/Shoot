@@ -32,20 +32,28 @@ public:
 	/*设置时针频率*/
 	void setTimeFrequency();
 
-	void setListener(ArrowSpriteLayer* layer);
-
-	void setLabel(ArrowSpriteLayer* layer);
-
-	void setArroSprite(ArrowSpriteLayer* layer);
+	
 
 	virtual void update(float dt);
 
-	void updateLabel(ArrowSpriteLayer* layer);
+	void updateLabel();
+
+	void onContact();
 
 	/*获得箭头的剩余个数*/
 	int getArrowSpriteNumber();
 	void addObserver(Observer* observer);
 	//CREATE_FUNC(ArrowSpriteLayer);
+protected:
+	void setListener();
+
+	void setLabel();
+
+	void setArroSprite();
+	
+	
+
+
 public:
 	bool isflying = false;
 	float scores = 0;

@@ -1,6 +1,6 @@
 #ifndef _MonsterSpriteLayer_H_
 #define _MonsterSpriteLayer_H_
-#define MONSTERS_NUM 4
+
 
 #include"cocos2d.h"
 #include"Observer.h"

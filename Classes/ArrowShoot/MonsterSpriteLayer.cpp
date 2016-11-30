@@ -21,7 +21,7 @@ bool MonsterSpriteLayer::init(){
 
 	
 	/*将怪物精灵装进容器*/
-	for (int i = 1; i <= MONSTERS_NUM; i++){
+	for (int i = 1; i <= MONSTER_NUM; i++){
 		sprintf(name, "zombie%d.png", i);
 		Sprite* monsterSprite = Sprite::createWithSpriteFrameName(name);
 		monsterSprite->setTag(5);
@@ -119,7 +119,7 @@ void MonsterSpriteLayer::monsterNumberDecrease(){
 
 void MonsterSpriteLayer::setMonstersPosition(TMXObjectGroup* monsterObjectGroup){
 	char monstername[20];
-	for (int i = 0; i < MONSTERS_NUM; i++){
+	for (int i = 0; i < MONSTER_NUM; i++){
 		Sprite* monsterSprite = this->vecMonsterSprite.at(i);
 		sprintf(monstername, "Monster%d", i+1);
 		ValueMap monsterPointMap = monsterObjectGroup->getObject(monstername);
@@ -140,6 +140,7 @@ int MonsterSpriteLayer::getMonsterNumber(){
 void MonsterSpriteLayer::onContact()
 {
 	this->monsterNumber--;
+	_observer->onEventHappen(this, Contact);
 }
 
 void MonsterSpriteLayer::addObserver(Observer * observer)

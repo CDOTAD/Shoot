@@ -8,12 +8,12 @@ bool ArrowSpriteStep1Layer::init()
 		return false;
 	}
 
-	this->ARROWNUMBER = 10;
+	this->ARROWNUMBER = STEP_ONE_ARROW;
 
-	setArroSprite(this);
+	setArroSprite();
 
-	setListener(this);
-	setLabel(this);
+	setListener();
+	setLabel();
 
 	scheduleUpdate();
 	return true;
