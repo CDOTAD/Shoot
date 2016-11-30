@@ -20,6 +20,9 @@ bool MainStep3Scene::init(){
 		return false;
 	}
 
+	_monsterNumber = MONSTER_NUM;
+	_arrowNumber = STEP_THREE_ARROW;
+
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 
 	/*加载地图*/
@@ -97,7 +100,8 @@ bool MainStep3Scene::init(){
 				nodeA->getPhysicsBody()->removeFromWorld();
 				nodeA->removeFromParentAndCleanup(true);
 			}
-			_monsterLayer->monsterNumberDecrease();
+			//_monsterLayer->monsterNumberDecrease();
+			_monsterLayer->onContact();
 		}
 
 		//arrow->getArrowSprite()->getPhysicsBody()->removeFromWorld();
@@ -116,7 +120,8 @@ bool MainStep3Scene::init(){
 		this->_arrowLayer->getArrowSprite()->setVisible(false);
 		if (_monsterLayer->getMonsterNumber() > 0) {
 			this->_arrowLayer->changeArrowSpriteReferTo();
-			this->_arrowLayer->updateLabel(_arrowLayer);
+			this->_arrowLayer->onContact();
+			this->_arrowLayer->updateLabel();
 		}
 	};
 
@@ -149,48 +154,51 @@ void MainStep3Scene::update(float dt){
 	this->scores += 0.1;
 	/*判断箭是否碰撞到了障碍*/
 	Sprite* arrowSprite = this->_arrowLayer->getArrowSprite();
-	Point arrowPoint = arrowSprite->getPosition();
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-	/*飞出屏幕上方则忽略*/
-	if (arrowPoint.y < visibleSize.height){
-		/*将坐标转化为瓦片地图里的坐标*/
-		Size arrowSize = this->_arrowLayer->getArrowSprite()->getContentSize();
-		Size mapTiledNum = this->_mapLayer->getMap()->getMapSize();
-		Size tiledSize = this->_mapLayer->getMap()->getTileSize();
-		if (arrowPoint.x + arrowSize.width / 2 < visibleSize.width){
-			int tiledPosX = (arrowPoint.x + arrowSize.width / 2) / tiledSize.width;
-			int tiledPosY = (640 - arrowPoint.y) / tiledSize.height;
+	if (arrowSprite)
+	{
+		Point arrowPoint = arrowSprite->getPosition();
+		Size visibleSize = Director::getInstance()->getVisibleSize();
+		/*飞出屏幕上方则忽略*/
+		if (arrowPoint.y < visibleSize.height) {
+			/*将坐标转化为瓦片地图里的坐标*/
+			Size arrowSize = this->_arrowLayer->getArrowSprite()->getContentSize();
+			Size mapTiledNum = this->_mapLayer->getMap()->getMapSize();
+			Size tiledSize = this->_mapLayer->getMap()->getTileSize();
+			if (arrowPoint.x + arrowSize.width / 2 < visibleSize.width) {
+				int tiledPosX = (arrowPoint.x + arrowSize.width / 2) / tiledSize.width;
+				int tiledPosY = (640 - arrowPoint.y) / tiledSize.height;
 
-			Point tiledPos = Point(tiledPosX, tiledPosY);
+				Point tiledPos = Point(tiledPosX, tiledPosY);
 
-			TMXLayer* meta = this->_mapLayer->getMap()->getLayer("obscatle");
-			int tiledGid = meta->getTileGIDAt(tiledPos);
+				TMXLayer* meta = this->_mapLayer->getMap()->getLayer("obscatle");
+				int tiledGid = meta->getTileGIDAt(tiledPos);
 
-			if (tiledGid != 0){
-				arrowSprite->getPhysicsBody()->removeFromWorld();
-				//arrowSprite->removeFromParent();//removeFromPhysicsWorld();
-				arrowSprite->stopAllActions();
-				
-				this->_arrowLayer->changeArrowSpriteReferTo();
-				
-				this->_arrowLayer->updateLabel(_arrowLayer);
+				if (tiledGid != 0) {
+					arrowSprite->getPhysicsBody()->removeFromWorld();
+					//arrowSprite->removeFromParent();//removeFromPhysicsWorld();
+					arrowSprite->stopAllActions();
+
+					this->_arrowLayer->changeArrowSpriteReferTo();
+
+					this->_arrowLayer->updateLabel();
+				}
 			}
 		}
-	}
-	if (this->_flagBurning == true){
-		float arrowX = arrowPoint.x;
-		float arrowY = arrowPoint.y;
-		float burningX = this->burningbatch->getPosition().x;
-		float burningY = this->burningbatch->getPosition().y;
-		if ((arrowX + arrowSprite->getContentSize().width / 2) >= 8 * 32 && (arrowX - arrowSprite->getContentSize().width / 2) <= 11 * 32){
-			//arrowSprite->getPhysicsBody()->removeFromWorld();
-			arrowSprite->removeFromParent();//removeFromPhysicsWorld();
-			arrowSprite->stopAllActions();
-			arrowSprite->setVisible(false);
-			
-			this->_arrowLayer->changeArrowSpriteReferTo();
-			
-			this->_arrowLayer->updateLabel(_arrowLayer);
+		if (this->_flagBurning == true) {
+			float arrowX = arrowPoint.x;
+			float arrowY = arrowPoint.y;
+			float burningX = this->burningbatch->getPosition().x;
+			float burningY = this->burningbatch->getPosition().y;
+			if ((arrowX + arrowSprite->getContentSize().width / 2) >= 8 * 32 && (arrowX - arrowSprite->getContentSize().width / 2) <= 11 * 32) {
+				//arrowSprite->getPhysicsBody()->removeFromWorld();
+				arrowSprite->removeFromParent();//removeFromPhysicsWorld();
+				arrowSprite->stopAllActions();
+				arrowSprite->setVisible(false);
+
+				this->_arrowLayer->changeArrowSpriteReferTo();
+
+				this->_arrowLayer->updateLabel();
+			}
 		}
 	}
 
@@ -226,7 +234,8 @@ void MainStep3Scene::judge(float dt){
 	}
 }
 
-void MainStep3Scene::setBurning(float dt){
+void MainStep3Scene::setBurning(float dt)
+{
 	this->burningbatch->setVisible(true);
 	this->_flagBurning = true;
 	this->scheduleOnce(schedule_selector(MainStep3Scene::deleteBurning), 1.5f);
@@ -237,7 +246,23 @@ void MainStep3Scene::onEventHappen(Layer * object, MyEvent e)
 	switch (e)
 	{
 	case NoArrow: {
-		break;
+		if (_monsterNumber > 0)
+		{
+			Size visibleSize = Director::getInstance()->getVisibleSize();
+			float score = MAX_SCORES - 20 * this->_monsterLayer->getMonsterNumber() - 0.1*this->scores;
+			int scorefinal = (int)(0.5*score + this->Scores);
+			char finalscore[20];
+			sprintf(finalscore, "%d", scorefinal);
+			auto scorelabel = LabelTTF::create(finalscore, "Brush Script MT", 32);
+			scorelabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
+			MessageBox("There are no arrows left", "Poi!");
+			Director::getInstance()->pause();
+			this->faillayer = FailLayer::create();
+			this->faillayer->mainStep3Layer = this;
+			this->addChild(faillayer, 20);
+			this->addChild(scorelabel, 21);
+			break;
+		}
 	}
 	case NoMonster: {
 
@@ -249,9 +274,12 @@ void MainStep3Scene::onEventHappen(Layer * object, MyEvent e)
 
 	}
 	case ArrowRotate: {
-		float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
-		this->arch->setRotation(angle);
-		break;
+		if (((ArrowSpriteLayer*)object)->getArrowSprite())
+		{
+			float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
+			this->arch->setRotation(angle);
+			break;
+		}
 	}
 	case Contact: {
 		if (MONSTER_LAYER_TAG == object->getTag())
@@ -266,7 +294,7 @@ void MainStep3Scene::onEventHappen(Layer * object, MyEvent e)
 	}
 	case ArrowOut: {
 		this->_arrowNumber--;
-		this->_arrowLayer->updateLabel(_arrowLayer);
+		this->_arrowLayer->updateLabel();
 		break;
 	}
 	default:
@@ -274,7 +302,8 @@ void MainStep3Scene::onEventHappen(Layer * object, MyEvent e)
 	}
 }
 
-void MainStep3Scene::deleteBurning(float dt){
+void MainStep3Scene::deleteBurning(float dt)
+{
 	this->burningbatch->setVisible(false);
 	this->_flagBurning = false;
 }

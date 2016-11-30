@@ -23,6 +23,9 @@ bool MainStep2Scene::init(){
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 
+	_arrowNumber = STEP_TWO_ARROW;
+	_monsterNumber = MONSTER_NUM;
+
 	/*加载地图*/
 	this->_mapLayer = MapLayer::create();
 	this->addChild(_mapLayer, 1);
@@ -82,9 +85,10 @@ bool MainStep2Scene::init(){
 				nodeA->getPhysicsBody()->removeFromWorld();
 				nodeA->removeFromParentAndCleanup(true);
 			}
-			_monsterLayer->monsterNumberDecrease();
+			//_monsterLayer->monsterNumberDecrease();
+			_monsterLayer->onContact();
 		}
-
+		
 		//arrow->getPhysicsBody()->removeFromWorld();
 
 		//arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
@@ -96,12 +100,16 @@ bool MainStep2Scene::init(){
 	};
 
 	_contactListener->onContactSeparate = [=](PhysicsContact &contact) {
-	
-		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->removeFromWorld();
-		this->_arrowLayer->getArrowSprite()->setVisible(false);
-		if (_monsterLayer->getMonsterNumber() > 0) {
-			this->_arrowLayer->changeArrowSpriteReferTo();
-			this->_arrowLayer->updateLabel(_arrowLayer);
+		if(this->_arrowLayer->getArrowSprite())
+		{
+			this->_arrowLayer->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+			this->_arrowLayer->getArrowSprite()->setVisible(false);
+			if (_monsterLayer->getMonsterNumber() > 0)
+			{
+				this->_arrowLayer->changeArrowSpriteReferTo();
+				this->_arrowLayer->onContact();
+				this->_arrowLayer->updateLabel();
+			}
 		}
 	};
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_contactListener, this);
@@ -133,6 +141,22 @@ void MainStep2Scene::onEventHappen(Layer * object, MyEvent e)
 	switch (e)
 	{
 	case NoArrow: {
+		if (_monsterNumber > 0)
+		{
+			Size visibleSize = Director::getInstance()->getVisibleSize();
+			float score = MAX_SCORES - 20 * this->_monsterLayer->getMonsterNumber() - 0.1*this->scores;
+			int scorefinal = (int)(0.3*score + this->Scores);
+			char finalscore[20];
+			sprintf(finalscore, "%d", scorefinal);
+			auto scorelabel = LabelTTF::create(finalscore, "Brush Script MT", 32);
+			scorelabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
+			MessageBox("There are no arrows left", "Poi!");
+			Director::getInstance()->pause();
+			this->faillayer = FailLayer::create();
+			this->faillayer->mainStep2Layer = this;
+			this->addChild(faillayer, 20);
+			this->addChild(scorelabel, 21);
+		}
 		break;
 	}
 	case NoMonster: {
@@ -149,9 +173,12 @@ void MainStep2Scene::onEventHappen(Layer * object, MyEvent e)
 
 	}
 	case ArrowRotate: {
-		float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
-		this->arch->setRotation(angle);
-		break;
+		if (((ArrowSpriteLayer*)object)->getArrowSprite())
+		{
+			float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
+			this->arch->setRotation(angle);
+			break;
+		}
 	}
 	case Contact: {
 		if (MONSTER_LAYER_TAG == object->getTag())
@@ -167,7 +194,7 @@ void MainStep2Scene::onEventHappen(Layer * object, MyEvent e)
 	case ArrowOut: {
 		this->_arrowNumber--;
 
-		this->_arrowLayer->updateLabel(_arrowLayer);
+		this->_arrowLayer->updateLabel();
 		break;
 	}
 	default:
@@ -175,70 +202,75 @@ void MainStep2Scene::onEventHappen(Layer * object, MyEvent e)
 	}
 }
 
-void MainStep2Scene::update(float dt){
+void MainStep2Scene::update(float dt)
+{
 	this->scores += 0.1;
 	/*判断箭是否碰撞到了障碍*/
 	Sprite* arrowSprite = this->_arrowLayer->getArrowSprite();
-	Point arrowPoint = arrowSprite->getPosition();
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-	/*飞出屏幕上方则忽略*/
-	if (arrowPoint.y < visibleSize.height){
-		/*将坐标转化为瓦片地图里的坐标*/
-		Size arrowSize = this->_arrowLayer->getArrowSprite()->getContentSize();
-		Size mapTiledNum = this->_mapLayer->getMap()->getMapSize();
-		Size tiledSize = this->_mapLayer->getMap()->getTileSize();
-		if (arrowPoint.x + arrowSize.width / 2 < visibleSize.width){
-			int tiledPosX = (arrowPoint.x + arrowSize.width / 2) / tiledSize.width;
-			int tiledPosY = (640 - arrowPoint.y) / tiledSize.height;
+	if (arrowSprite)
+	{
 
-			Point tiledPos = Point(tiledPosX, tiledPosY);
+		Point arrowPoint = arrowSprite->getPosition();
+		Size visibleSize = Director::getInstance()->getVisibleSize();
+		/*飞出屏幕上方则忽略*/
+		if (arrowPoint.y < visibleSize.height) {
+			/*将坐标转化为瓦片地图里的坐标*/
+			Size arrowSize = this->_arrowLayer->getArrowSprite()->getContentSize();
+			Size mapTiledNum = this->_mapLayer->getMap()->getMapSize();
+			Size tiledSize = this->_mapLayer->getMap()->getTileSize();
+			if (arrowPoint.x + arrowSize.width / 2 < visibleSize.width) {
+				int tiledPosX = (arrowPoint.x + arrowSize.width / 2) / tiledSize.width;
+				int tiledPosY = (640 - arrowPoint.y) / tiledSize.height;
 
-			TMXLayer* meta = this->_mapLayer->getMap()->getLayer("obscatle");
-			int tiledGid = meta->getTileGIDAt(tiledPos);
+				Point tiledPos = Point(tiledPosX, tiledPosY);
 
-			if (tiledGid != 0){
+				TMXLayer* meta = this->_mapLayer->getMap()->getLayer("obscatle");
+				int tiledGid = meta->getTileGIDAt(tiledPos);
 
-				arrowSprite->getPhysicsBody()->removeFromWorld();
+				if (tiledGid != 0) {
 
-				//arrowSprite->removeFromParent();//removeFromPhysicsWorld();
-				arrowSprite->stopAllActions();
-				
-				this->_arrowLayer->changeArrowSpriteReferTo();
-				
-				this->_arrowLayer->updateLabel(_arrowLayer);
+					arrowSprite->getPhysicsBody()->removeFromWorld();
+
+					//arrowSprite->removeFromParent();//removeFromPhysicsWorld();
+					arrowSprite->stopAllActions();
+
+					this->_arrowLayer->changeArrowSpriteReferTo();
+
+					this->_arrowLayer->updateLabel();
+				}
 			}
 		}
 	}
 
 }
 
-void MainStep2Scene::judge(float dt){
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-	if (this->_arrowLayer->getArrowSpriteNumber() >= 0 && this->_monsterLayer->getMonsterNumber() == 0){
-		float score = MAX_SCORES + 4 * this->_arrowLayer->getArrowSpriteNumber() - 8 * this->_monsterLayer->getMonsterNumber() - 0.01*this->scores;
-		//this->_arrowLayer->step = 3;
-		this->_mapLayer->step = 3;
-		this->_monsterLayer->step = 3;
-		auto step3 = MainStep3Scene::create();
-		step3->Scores = 0.3*score;
-		Director::getInstance()->replaceScene(
-			TransitionSplitRows::create(3.0f, MainStep3Scene::CreateScene()));
-	}
-	if (this->_arrowLayer->getArrowSpriteNumber() <= 0 && this->_monsterLayer->getMonsterNumber() > 0){
-		float score = MAX_SCORES - 20 * this->_monsterLayer->getMonsterNumber() - 0.1*this->scores;
-		int scorefinal = (int)(0.3*score + this->Scores);
-		char finalscore[20];
-		sprintf(finalscore, "%d", scorefinal);
-		auto scorelabel = LabelTTF::create(finalscore, "Brush Script MT", 32);
-		scorelabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
-		MessageBox("There are no arrows left", "Poi!");
-		Director::getInstance()->pause();
-		this->faillayer = FailLayer::create();
-		this->faillayer->mainStep2Layer = this;
-		this->addChild(faillayer, 20);
-		this->addChild(scorelabel, 21);
-	}
-}
+//void MainStep2Scene::judge(float dt){
+//	Size visibleSize = Director::getInstance()->getVisibleSize();
+//	if (this->_arrowLayer->getArrowSpriteNumber() >= 0 && this->_monsterLayer->getMonsterNumber() == 0){
+//		float score = MAX_SCORES + 4 * this->_arrowLayer->getArrowSpriteNumber() - 8 * this->_monsterLayer->getMonsterNumber() - 0.01*this->scores;
+//		//this->_arrowLayer->step = 3;
+//		this->_mapLayer->step = 3;
+//		this->_monsterLayer->step = 3;
+//		auto step3 = MainStep3Scene::create();
+//		step3->Scores = 0.3*score;
+//		Director::getInstance()->replaceScene(
+//			TransitionSplitRows::create(3.0f, MainStep3Scene::CreateScene()));
+//	}
+//	if (this->_arrowLayer->getArrowSpriteNumber() <= 0 && this->_monsterLayer->getMonsterNumber() > 0){
+//		float score = MAX_SCORES - 20 * this->_monsterLayer->getMonsterNumber() - 0.1*this->scores;
+//		int scorefinal = (int)(0.3*score + this->Scores);
+//		char finalscore[20];
+//		sprintf(finalscore, "%d", scorefinal);
+//		auto scorelabel = LabelTTF::create(finalscore, "Brush Script MT", 32);
+//		scorelabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
+//		MessageBox("There are no arrows left", "Poi!");
+//		Director::getInstance()->pause();
+//		this->faillayer = FailLayer::create();
+//		this->faillayer->mainStep2Layer = this;
+//		this->addChild(faillayer, 20);
+//		this->addChild(scorelabel, 21);
+//	}
+//}
 
 
 Vec2 MainStep2Scene::getSpeed(){
