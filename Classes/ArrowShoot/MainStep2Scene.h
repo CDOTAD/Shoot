@@ -49,8 +49,8 @@ private:
 	int arrowleft = 0;
 	
 	Sprite* musicon;
-	//Sprite* myHero;
-	//Sprite* arch;
+	Sprite* myHero;
+	Sprite* arch;
 	PauseLayer* pauselayer;
 	WinLayer* winlayer;
 	FailLayer* faillayer;

@@ -8,7 +8,7 @@ using namespace cocos2d;
 
 class MonsterSpriteLayer :public Layer{
 public:
-	bool init();
+	virtual bool init() = 0;
 	/*怪物被射中减少怪物个数*/
 	void monsterNumberDecrease();
 	/*根据瓦片地图的信息设置怪物位置*/
@@ -21,10 +21,15 @@ public:
 	void addObserver(Observer* observer);
 
 	void update(float dt);
-	CREATE_FUNC(MonsterSpriteLayer);
-public:
-	static int step;
-private:
+	float timerand(int i);
+	//CREATE_FUNC(MonsterSpriteLayer);
+//public:
+//	static int step;
+protected:
+	void addMonster();
+
+
+protected:
 
 	Observer* _observer;
 

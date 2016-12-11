@@ -2,6 +2,7 @@
 #include"FirstScene.h"
 #include"MainStep2Scene.h"
 #include"ArrowSpriteStep1Layer.h"
+#include"MonsterSpriteStep1Layer.h"
 
 
 
@@ -23,29 +24,71 @@ bool MainScene::init(){
 		return false;
 	}
 
+	
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("AS_Zombie.plist");
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("B_Figure.plist");
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Pictures.plist");
+
 	_arrowNumber = STEP_ONE_ARROW;
 	_monsterNumber = MONSTER_NUM;
 
-
+	Director* dir = Director::getInstance();
+	Size visibleSize = dir->getVisibleSize();
 	
 	/*加载地图*/
+	this->_mapLayer = MapLayer::create();
 
-	setMap(MapLayer::create(), 1);
+	//this->map->setPosition(10, 10);
 
-	/*加载退出按钮 菜单 弓*/
-	setCommonPart();
-
+	this->_mapLayer->step = 1;
+	this->addChild(_mapLayer, 1);
 	
-	/*加载箭头*/
+	//log("map.position = (%f , %f)", map->getPositionX(), map->getPositionY());
 
-	setArrowLayer(ArrowSpriteStep1Layer::create());
+
+	/*创建退出按钮*/
+	auto exitButton = MenuItemSprite::create(
+		Sprite::createWithSpriteFrameName("exit.png"),
+		Sprite::createWithSpriteFrameName("exitOn.png"),
+		CC_CALLBACK_1(MainScene::menuExitCallBack, this));
+	exitButton->setScale(0.4);
+	
+	auto menu = Menu::create(exitButton, NULL);
+	menu->setPosition(visibleSize.width*0.9, 32);
+	this->addChild(menu, 2);
+
+	/*加载箭头*/
+	this->_arrowLayer = ArrowSpriteStep1Layer::create();
+	this->_arrowLayer->setTag(ARROW_LAYER_TAG);
+	//this->_arrowLayer->step = 1;
+	this->_arrowLayer->addObserver(this);
+	_arrowLayer->setArrowPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_arrowLayer,2);
+	
+	/*加载弓*/
+	arch = Sprite::createWithSpriteFrameName("arch.png");
+	ValueMap archPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
+	float archX = archPointMap.at("x").asFloat();
+	float archY = archPointMap.at("y").asFloat();
+	arch->setPosition(archX + 20 , archY + 30);
+	arch->setScale(0.7f);
+	this->addChild(arch, 1);
 
 	/*加载怪物*/
-	setMonsterLayer(MonsterSpriteLayer::create(), 1);
-
-
+	this-> _monsterLayer = MonsterSpriteStep1Layer::create();
+	this->_monsterLayer->setTag(MONSTER_LAYER_TAG);
+	this->_monsterLayer->addObserver(this);
+	_monsterLayer->setMonstersPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_monsterLayer, 2);
+	
 	/*创建英雄*/
-	setHero(Sprite::createWithSpriteFrameName("B_huolong.png"));
+	myHero = Sprite::createWithSpriteFrameName("B_huolong.png");
+	ValueMap heroPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
+	float heroX = heroPointMap.at("x").asFloat();
+	float heroY = heroPointMap.at("y").asFloat();
+	myHero->setPosition(heroX + 25-64, heroY + 50);
+	myHero->setScale(0.1f);
+	this->addChild(myHero, 1);
 	
 	/*创建火焰效果*/
 	ValueMap firePointMap = this->_mapLayer->getObjectGroup()->getObject("Fire");
@@ -72,9 +115,58 @@ bool MainScene::init(){
 	this->addChild(burningbatch, 10);
 
 	/*碰撞监听器*/
+	_contactListener = EventListenerPhysicsContact::create();
+	
+	_contactListener->onContactBegin = [=](PhysicsContact &contact){
+		auto nodeA = contact.getShapeA()->getBody()->getNode();
+		auto nodeB = contact.getShapeB()->getBody()->getNode();
+		if (nodeA&&nodeB){
+			if (nodeA->getTag() == 10){
+				//nodeB->getPhysicsBody()->removeFromWorld();
+				//nodeB->removeFromParent();
+				
 
-	setListener();
+				/*
 
+				this->monsterLayer->onContact(int tag);
+
+				*/
+				
+				nodeB->getPhysicsBody()->removeFromWorld();
+				nodeB->setVisible(false);
+			}
+			else if (nodeB->getTag() == 10){
+				//nodeA->getPhysicsBody()->removeFromWorld();
+				//nodeA->removeFromParent();
+				nodeA->getPhysicsBody()->removeFromWorld();
+				nodeA->setVisible(false);
+			}
+			_monsterLayer->onContact();
+		}
+
+
+		return true;
+	};
+
+	_contactListener->onContactSeparate = [=](PhysicsContact &contact) {
+		if (this->_arrowLayer->getArrowSprite()) 
+		{
+			this->_arrowLayer->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+			/*this->getScene()->getPhysicsWorld()->removeBody(_arrowLayer->getArrowSprite()->getPhysicsBody());
+			log("%d", this->getScene()->getTag());*/
+			this->_arrowLayer->getArrowSprite()->setVisible(false);
+			if (_monsterLayer->getMonsterNumber() > 0) {
+
+				//log("contactSeparate");
+
+				this->_arrowLayer->changeArrowSpriteReferTo();
+				this->_arrowLayer->onContact();
+				this->_arrowLayer->updateLabel();
+			}
+		}
+	};
+
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_contactListener, this);
 	
 	/*键盘监听器*/
 	auto listenerKeypad = EventListenerKeyboard::create();
@@ -227,7 +319,7 @@ void MainScene::onEventHappen(Layer * object, MyEvent e)
 		float score = MAX_SCORES + 4 * this->_arrowLayer->getArrowSpriteNumber() - 8 * this->_monsterLayer->getMonsterNumber() - 0.01*this->scores;
 		//this->_arrowLayer->step = 2;
 		this->_mapLayer->step = 2;
-		this->_monsterLayer->step = 2;
+		//this->_monsterLayer->step = 2;
 		auto step2 = MainStep2Scene::create();
 		/*step2->Scores = 0.2*score;*/
 		Director::getInstance()->replaceScene(
@@ -240,9 +332,7 @@ void MainScene::onEventHappen(Layer * object, MyEvent e)
 		if (((ArrowSpriteLayer*)object)->getArrowSprite()) 
 		{
 			float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
-
-			this->_arch->setRotation(angle);
-
+			this->arch->setRotation(angle);
 		}		break;
 	}
 	case Contact: {

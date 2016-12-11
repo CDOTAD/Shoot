@@ -1,6 +1,7 @@
 #include"MainStep2Scene.h"
 #include"MainStep3Scene.h"
 #include"ArrowSpriteStep2Layer.h"
+#include"MonsterSpriteStep2Layer.h"
 
 float MainStep2Scene::Scores = 0;
 
@@ -21,37 +22,98 @@ bool MainStep2Scene::init(){
 		return false;
 	}
 
-	//Size visibleSize = Director::getInstance()->getVisibleSize();
-
-	_arrowNumber = STEP_TWO_ARROW;
-	_monsterNumber = MONSTER_NUM;
+	Size visibleSize = Director::getInstance()->getVisibleSize();
 
 	_arrowNumber = STEP_TWO_ARROW;
 	_monsterNumber = MONSTER_NUM;
 
 	/*¼ÓÔØµØÍ¼*/
-	setMap(MapLayer::create(), 2);
+	this->_mapLayer = MapLayer::create();
+	this->addChild(_mapLayer, 1);
 
 	/*´´½¨ÍË³ö°´Å¥*/
+	auto exitButton = MenuItemSprite::create(
+		Sprite::createWithSpriteFrameName("exit.png"),
+		Sprite::createWithSpriteFrameName("exitOn.png"),
+		CC_CALLBACK_1(MainStep2Scene::menuExitCallBack, this));
+	exitButton->setScale(0.4);
 
-	setCommonPart();
+	auto menu = Menu::create(exitButton, NULL);
+	menu->setPosition(visibleSize.width*0.9, 32);
+	this->addChild(menu, 2);
 
 	/*¼ÓÔØ¼ýÍ·*/
+	this->_arrowLayer = ArrowSpriteStep2Layer::create();
+	this->_arrowLayer->addObserver(this);
+	_arrowLayer->setArrowPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_arrowLayer, 2);
 
-	setArrowLayer(ArrowSpriteStep2Layer::create());
-
+	/*¼ÓÔØ¹­*/
+	arch = Sprite::createWithSpriteFrameName("arch.png");
+	ValueMap archPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
+	float archX = archPointMap.at("x").asFloat();
+	float archY = archPointMap.at("y").asFloat();
+	arch->setPosition(archX + 20, archY + 30);
+	arch->setScale(0.7f);
+	this->addChild(arch, 1);
 
 	/*¼ÓÔØ¹ÖÎï*/
-	setMonsterLayer(MonsterSpriteLayer::create(), 2);
-
+	this->_monsterLayer = MonsterSpriteStep2Layer::create();
+	this->_monsterLayer->addObserver(this);
+	_monsterLayer->setMonstersPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_monsterLayer, 2);
+	
 	/*´´½¨Ó¢ÐÛ*/
-	setHero(Sprite::createWithSpriteFrameName("B_littlestar.png"));/*
-
+	myHero = Sprite::createWithSpriteFrameName("B_littlestar.png");
+	ValueMap heroPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
+	float heroX = heroPointMap.at("x").asFloat();
+	float heroY = heroPointMap.at("y").asFloat();
+	myHero->setPosition(heroX + 25-55, heroY + 50);
+	myHero->setScale(0.1f);
+	this->addChild(myHero, 1);
 
 	/*Åö×²¼àÌýÆ÷*/
+	_contactListener = EventListenerPhysicsContact::create();
+	_contactListener->onContactBegin = [=](PhysicsContact &contact){
+		auto nodeA = contact.getShapeA()->getBody()->getNode();
+		auto nodeB = contact.getShapeB()->getBody()->getNode();
+		if (nodeA&&nodeB){
+			if (nodeA->getTag() == 10){
+				nodeB->getPhysicsBody()->removeFromWorld();
+				nodeB->removeFromParentAndCleanup(true);
+			}
+			else if (nodeB->getTag() == 10){
+				nodeA->getPhysicsBody()->removeFromWorld();
+				nodeA->removeFromParentAndCleanup(true);
+			}
+			//_monsterLayer->monsterNumberDecrease();
+			_monsterLayer->onContact();
+		}
+		
+		//arrow->getPhysicsBody()->removeFromWorld();
 
-	setListener();
-	
+		//arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
+		//arrow->getArrowSprite()->setVisible(false);
+		//if (monster->getMonsterNumber() > 0){
+		//	arrow->changeArrowSpriteReferTo();
+		//}
+		return true;
+	};
+
+	_contactListener->onContactSeparate = [=](PhysicsContact &contact) {
+		if(this->_arrowLayer->getArrowSprite())
+		{
+			this->_arrowLayer->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+			this->_arrowLayer->getArrowSprite()->setVisible(false);
+			if (_monsterLayer->getMonsterNumber() > 0)
+			{
+				this->_arrowLayer->changeArrowSpriteReferTo();
+				this->_arrowLayer->onContact();
+				this->_arrowLayer->updateLabel();
+			}
+		}
+	};
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_contactListener, this);
 
 	/*¼üÅÌ¼àÌýÆ÷*/
 	auto listenerKeypad = EventListenerKeyboard::create();
@@ -102,7 +164,7 @@ void MainStep2Scene::onEventHappen(Layer * object, MyEvent e)
 
 		//this->_arrowLayer->step = 3;
 		this->_mapLayer->step = 3;
-		this->_monsterLayer->step = 3;
+		//this->_monsterLayer->step = 3;
 		//auto step3 = MainStep3Scene::create();
 		//step3->Scores = 0.3*score;
 		Director::getInstance()->replaceScene(
@@ -115,9 +177,7 @@ void MainStep2Scene::onEventHappen(Layer * object, MyEvent e)
 		if (((ArrowSpriteLayer*)object)->getArrowSprite())
 		{
 			float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
-
-			this->_arch->setRotation(angle);
-
+			this->arch->setRotation(angle);
 			break;
 		}
 	}
@@ -185,6 +245,35 @@ void MainStep2Scene::update(float dt)
 
 }
 
+//void MainStep2Scene::judge(float dt){
+//	Size visibleSize = Director::getInstance()->getVisibleSize();
+//	if (this->_arrowLayer->getArrowSpriteNumber() >= 0 && this->_monsterLayer->getMonsterNumber() == 0){
+//		float score = MAX_SCORES + 4 * this->_arrowLayer->getArrowSpriteNumber() - 8 * this->_monsterLayer->getMonsterNumber() - 0.01*this->scores;
+//		//this->_arrowLayer->step = 3;
+//		this->_mapLayer->step = 3;
+//		this->_monsterLayer->step = 3;
+//		auto step3 = MainStep3Scene::create();
+//		step3->Scores = 0.3*score;
+//		Director::getInstance()->replaceScene(
+//			TransitionSplitRows::create(3.0f, MainStep3Scene::CreateScene()));
+//	}
+//	if (this->_arrowLayer->getArrowSpriteNumber() <= 0 && this->_monsterLayer->getMonsterNumber() > 0){
+//		float score = MAX_SCORES - 20 * this->_monsterLayer->getMonsterNumber() - 0.1*this->scores;
+//		int scorefinal = (int)(0.3*score + this->Scores);
+//		char finalscore[20];
+//		sprintf(finalscore, "%d", scorefinal);
+//		auto scorelabel = LabelTTF::create(finalscore, "Brush Script MT", 32);
+//		scorelabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
+//		MessageBox("There are no arrows left", "Poi!");
+//		Director::getInstance()->pause();
+//		this->faillayer = FailLayer::create();
+//		this->faillayer->mainStep2Layer = this;
+//		this->addChild(faillayer, 20);
+//		this->addChild(scorelabel, 21);
+//	}
+//}
+
+
 Vec2 MainStep2Scene::getSpeed(){
 	return this->speed;
 }
@@ -203,4 +292,18 @@ void MainStep2Scene::Pause(){
 	this->pauselayer->mainStep3Layer = NULL;
 	this->pauselayer->mainPlayLayer = NULL;
 	this->addChild(pauselayer, 20);
+}
+
+void MainStep2Scene::menuExitCallBack(Ref* pSender){
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+	MessageBox("You pressed the close button. Windows Store Apps do not implement a close button.", "Alert");
+	return;
+#endif
+
+	Director::getInstance()->end();
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+	exit(0);
+#endif
+
 }
