@@ -26,8 +26,7 @@ bool MainScene::init(){
 	_arrowNumber = STEP_ONE_ARROW;
 	_monsterNumber = MONSTER_NUM;
 
-	Director* dir = Director::getInstance();
-	Size visibleSize = dir->getVisibleSize();
+
 	
 	/*¼ÓÔØµØÍ¼*/
 
@@ -38,10 +37,12 @@ bool MainScene::init(){
 
 	
 	/*¼ÓÔØ¼ýÍ·*/
+
 	setArrowLayer(ArrowSpriteStep1Layer::create());
 
 	/*¼ÓÔØ¹ÖÎï*/
 	setMonsterLayer(MonsterSpriteLayer::create(), 1);
+
 
 	/*´´½¨Ó¢ÐÛ*/
 	setHero(Sprite::createWithSpriteFrameName("B_huolong.png"));
@@ -71,7 +72,9 @@ bool MainScene::init(){
 	this->addChild(burningbatch, 10);
 
 	/*Åö×²¼àÌýÆ÷*/
+
 	setListener();
+
 	
 	/*¼üÅÌ¼àÌýÆ÷*/
 	auto listenerKeypad = EventListenerKeyboard::create();
@@ -237,7 +240,9 @@ void MainScene::onEventHappen(Layer * object, MyEvent e)
 		if (((ArrowSpriteLayer*)object)->getArrowSprite()) 
 		{
 			float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
+
 			this->_arch->setRotation(angle);
+
 		}		break;
 	}
 	case Contact: {

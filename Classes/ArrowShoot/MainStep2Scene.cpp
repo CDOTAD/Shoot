@@ -26,102 +26,32 @@ bool MainStep2Scene::init(){
 	_arrowNumber = STEP_TWO_ARROW;
 	_monsterNumber = MONSTER_NUM;
 
+	_arrowNumber = STEP_TWO_ARROW;
+	_monsterNumber = MONSTER_NUM;
+
 	/*¼ÓÔØµØÍ¼*/
 	setMap(MapLayer::create(), 2);
 
 	/*´´½¨ÍË³ö°´Å¥*/
 
 	setCommonPart();
-/*
-	auto exitButton = MenuItemSprite::create(
-		Sprite::createWithSpriteFrameName("exit.png"),
-		Sprite::createWithSpriteFrameName("exitOn.png"),
-		CC_CALLBACK_1(MainStep2Scene::menuExitCallBack, this));
-	exitButton->setScale(0.4);
 
-	auto menu = Menu::create(exitButton, NULL);
-	menu->setPosition(visibleSize.width*0.9, 32);
-	this->addChild(menu, 2);
-*/
 	/*¼ÓÔØ¼ıÍ·*/
 
 	setArrowLayer(ArrowSpriteStep2Layer::create());
 
-	//this->_arrowLayer = ArrowSpriteStep2Layer::create();
-	//this->_arrowLayer->addObserver(this);
-	//_arrowLayer->setArrowPosition(this->_mapLayer->getObjectGroup());
-	//this->addChild(_arrowLayer, 2);
 
-	/*¼ÓÔØ¹­*/
-	/*arch = Sprite::createWithSpriteFrameName("arch.png");
-	ValueMap archPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
-	float archX = archPointMap.at("x").asFloat();
-	float archY = archPointMap.at("y").asFloat();
-	arch->setPosition(archX + 20, archY + 30);
-	arch->setScale(0.7f);
-	this->addChild(arch, 1);
-*/
 	/*¼ÓÔØ¹ÖÎï*/
 	setMonsterLayer(MonsterSpriteLayer::create(), 2);
-/*
-	this->_monsterLayer = MonsterSpriteLayer::create();
-	this->_monsterLayer->addObserver(this);
-	_monsterLayer->setMonstersPosition(this->_mapLayer->getObjectGroup());
-	this->addChild(_monsterLayer, 2);
-	*/
+
 	/*´´½¨Ó¢ĞÛ*/
 	setHero(Sprite::createWithSpriteFrameName("B_littlestar.png"));/*
-	myHero = Sprite::createWithSpriteFrameName("B_littlestar.png");
-	ValueMap heroPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
-	float heroX = heroPointMap.at("x").asFloat();
-	float heroY = heroPointMap.at("y").asFloat();
-	myHero->setPosition(heroX + 25-55, heroY + 50);
-	myHero->setScale(0.1f);
-	this->addChild(myHero, 1);*/
+
 
 	/*Åö×²¼àÌıÆ÷*/
+
 	setListener();
-	//_contactListener = EventListenerPhysicsContact::create();
-	//_contactListener->onContactBegin = [=](PhysicsContact &contact){
-	//	auto nodeA = contact.getShapeA()->getBody()->getNode();
-	//	auto nodeB = contact.getShapeB()->getBody()->getNode();
-	//	if (nodeA&&nodeB){
-	//		if (nodeA->getTag() == 10){
-	//			nodeB->getPhysicsBody()->removeFromWorld();
-	//			nodeB->removeFromParentAndCleanup(true);
-	//		}
-	//		else if (nodeB->getTag() == 10){
-	//			nodeA->getPhysicsBody()->removeFromWorld();
-	//			nodeA->removeFromParentAndCleanup(true);
-	//		}
-	//		//_monsterLayer->monsterNumberDecrease();
-	//		_monsterLayer->onContact();
-	//	}
-	//	
-	//	//arrow->getPhysicsBody()->removeFromWorld();
-
-	//	//arrow->getArrowSprite()->removeFromParent();//removeFromPhysicsWorld();
-	//	//arrow->getArrowSprite()->setVisible(false);
-	//	//if (monster->getMonsterNumber() > 0){
-	//	//	arrow->changeArrowSpriteReferTo();
-	//	//}
-	//	return true;
-	//};
-
-	//_contactListener->onContactSeparate = [=](PhysicsContact &contact) {
-	//	if(this->_arrowLayer->getArrowSprite())
-	//	{
-	//		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->removeFromWorld();
-	//		this->_arrowLayer->getArrowSprite()->setVisible(false);
-	//		if (_monsterLayer->getMonsterNumber() > 0)
-	//		{
-	//			this->_arrowLayer->changeArrowSpriteReferTo();
-	//			this->_arrowLayer->onContact();
-	//			this->_arrowLayer->updateLabel();
-	//		}
-	//	}
-	//};
-	//Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_contactListener, this);
+	
 
 	/*¼üÅÌ¼àÌıÆ÷*/
 	auto listenerKeypad = EventListenerKeyboard::create();
@@ -185,7 +115,9 @@ void MainStep2Scene::onEventHappen(Layer * object, MyEvent e)
 		if (((ArrowSpriteLayer*)object)->getArrowSprite())
 		{
 			float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
+
 			this->_arch->setRotation(angle);
+
 			break;
 		}
 	}
@@ -252,7 +184,6 @@ void MainStep2Scene::update(float dt)
 	}
 
 }
-
 
 Vec2 MainStep2Scene::getSpeed(){
 	return this->speed;

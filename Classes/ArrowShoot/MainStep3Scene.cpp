@@ -53,8 +53,10 @@ bool MainStep3Scene::init(){
 	this->addChild(burningbatch, 10);
 
 	/*Åö×²¼àÌýÆ÷*/
+
 	
 	setListener();
+
 
 	/*¼üÅÌ¼àÌýÆ÷*/
 	auto listenerKeypad = EventListenerKeyboard::create();
@@ -131,6 +133,7 @@ void MainStep3Scene::update(float dt){
 
 }
 
+
 void MainStep3Scene::setBurning(float dt)
 {
 	this->burningbatch->setVisible(true);
@@ -175,6 +178,7 @@ void MainStep3Scene::onEventHappen(Layer * object, MyEvent e)
 		{
 			float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
 			this->_arch->setRotation(angle);
+
 			break;
 		}
 	}
