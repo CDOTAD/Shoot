@@ -1,7 +1,7 @@
 #include"FirstScene.h"
-#include"MainScene.h"
-#include"MapScene.h"
-#include"MainStep3Scene.h"
+#include "MainScene.h"
+#include "MainStep2Scene.h"
+#include "MainStep3Scene.h"
 
 Scene* FirstScene::CreateScene(){
 	auto scene = Scene::create();

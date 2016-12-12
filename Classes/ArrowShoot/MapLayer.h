@@ -3,13 +3,13 @@
 #include"cocos2d.h"
 using namespace cocos2d;
 
-class MapScene :public Layer{
+class MapLayer :public Layer{
 public:
-	static Scene* CreateScene();
+
 	virtual bool init();
 	/*·µ»ØÍßÆ¬µØÍ¼*/
 	TMXTiledMap* getMap();
-	CREATE_FUNC(MapScene);
+	CREATE_FUNC(MapLayer);
 public:
 	static int step;
 public:
