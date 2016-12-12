@@ -298,6 +298,16 @@ void ArrowSpriteLayer::setTimeFrequency()
 	timeFrequency = (double)frequency.QuadPart;
 }
 
+void ArrowSpriteLayer::myPause()
+{
+	this->isPause = true;
+}
+
+void ArrowSpriteLayer::myResume()
+{
+	this->isPause = false;
+}
+
 void ArrowSpriteLayer::setListener()
 {
 	auto listener = EventListenerTouchOneByOne::create();
@@ -398,8 +408,11 @@ void ArrowSpriteLayer::changeArrowSpriteReferTo()
 void ArrowSpriteLayer::update(float dt)
 {
 	/*判断箭是否飞出屏幕，如果飞出则换箭（可以飞出屏幕上方再落回）*/
-	log("this->arrownumber = %d - this->spriteNum = %d  = %d", this->ARROWNUMBER, this->spriteNum, this->ARROWNUMBER - this->spriteNum);
+	//log("this->arrownumber = %d - this->spriteNum = %d  = %d", this->ARROWNUMBER, this->spriteNum, this->ARROWNUMBER - this->spriteNum);
 	
+	log("isPause = %d", isPause);
+
+
 	if (_arrowSprite) 
 	{
 		Point arrowSpritePosition = _arrowSprite->getPosition();

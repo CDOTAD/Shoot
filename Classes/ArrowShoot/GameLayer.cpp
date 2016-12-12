@@ -5,7 +5,7 @@
 void GameLayer::onResume(Layer * objcet)
 {
 	_flagPressed = false;
-	//this->_arrowLayer->resume();
+	this->_arrowLayer->myResume();
 
 	if (this->_arrowLayer->isflying) 
 	{
@@ -185,7 +185,7 @@ void GameLayer::Pause()
 {
 	Director::getInstance()->pause();
 
-	//this->_arrowLayer->pause();
+	this->_arrowLayer->myPause();
 
 	if (this->_arrowLayer->isflying == true) 
 	{

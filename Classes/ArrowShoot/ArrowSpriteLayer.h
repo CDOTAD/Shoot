@@ -32,7 +32,9 @@ public:
 	/*ÉèÖÃÊ±ÕëÆµÂÊ*/
 	void setTimeFrequency();
 
-	
+	void myPause();
+
+	void myResume();
 
 	virtual void update(float dt);
 
