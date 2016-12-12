@@ -30,6 +30,7 @@ public:
 	virtual void setBurning(float dt) {};
 
 	virtual void onEventHappen(Layer* object, MyEvent e);
+	virtual void onAgain(Layer* objcet);
 
 	virtual void update(float dt);
 	void menuExitCallBack(cocos2d::Ref* pSender);

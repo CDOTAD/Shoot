@@ -22,3 +22,10 @@ class Observer
 public:
 	virtual void onEventHappen(Layer* object, MyEvent e) = 0;
 };
+
+class PauseObserver
+{
+public:
+	virtual void onResume(Layer* object) = 0;
+	virtual void onAgain(Layer* objcet) = 0;
+};

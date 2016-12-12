@@ -2,14 +2,9 @@
 #define _PauseLayer_H_
 
 #include"cocos2d.h"
-#include"MainScene.h"
-#include"MainStep2Scene.h"
-#include"MainStep3Scene.h"
+#include"Observer.h"
 using namespace cocos2d;
 
-class MainScene;
-class MainStep2Scene;
-class MainStep3Scene;
 
 class PauseLayer :public Layer{
 public:
@@ -18,16 +13,19 @@ public:
 	void menuAgainCallBack(cocos2d::Ref* pSender);
 	void menuResumeCallBack(cocos2d::Ref* pSender);
 	void menuExitCallBack(cocos2d::Ref* pSender);
+
+	void addObserver(PauseObserver* observer);
+
 	CREATE_FUNC(PauseLayer);
 public:
 	static int step;
 private:
 	Sprite* background;
 
+	PauseObserver* _observer;
+
 public:
-	MainScene* mainPlayLayer = NULL;
-	MainStep2Scene* mainStep2Layer = NULL;
-	MainStep3Scene* mainStep3Layer = NULL;
+	
 	
 
 };

@@ -59,19 +59,19 @@ bool MainStep3Scene::init(){
 	setListener();
 
 
-	/*¼üÅÌ¼àÌýÆ÷*/
-	auto listenerKeypad = EventListenerKeyboard::create();
-	listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event){
-		/*Èç¹û°´ESC¼ü´´½¨ÔÝÍ£²ã*/
-		if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
-			if (this->_flagPressed == false){
-				this->Pause();
-				this->_flagPressed = true;
-			}
+	///*¼üÅÌ¼àÌýÆ÷*/
+	//auto listenerKeypad = EventListenerKeyboard::create();
+	//listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event){
+	//	/*Èç¹û°´ESC¼ü´´½¨ÔÝÍ£²ã*/
+	//	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
+	//		if (this->_flagPressed == false){
+	//			this->Pause();
+	//			this->_flagPressed = true;
+	//		}
 
-		}
-	};
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeypad, this);
+	//	}
+	//};
+	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeypad, this);
 
 	this->scheduleUpdate();
 	this->schedule(schedule_selector(MainStep3Scene::setBurning), 6.0f, kRepeatForever, 0.0f);
@@ -204,6 +204,24 @@ void MainStep3Scene::onEventHappen(Layer * object, MyEvent e)
 	}
 }
 
+void MainStep3Scene::onAgain(Layer * objcet)
+{
+
+	this->removeChild(objcet, true);
+
+	Director::getInstance()->resume();
+
+	this->_monsterLayer->unscheduleUpdate();
+	this->_arrowLayer->unscheduleUpdate();
+	this->unscheduleUpdate();
+	
+
+	Director::getInstance()->replaceScene(
+		TransitionSplitRows::create(3.0f, MainStep3Scene::CreateScene()));
+
+
+}
+
 void MainStep3Scene::deleteBurning(float dt)
 {
 	this->burningbatch->setVisible(false);
@@ -214,17 +232,17 @@ Vec2 MainStep3Scene::getSpeed(){
 	return this->speed;
 }
 
-void MainStep3Scene::Pause(){
-	Director::getInstance()->pause();
-	if (this->_arrowLayer->isflying == true){
-		speed = this->_arrowLayer->getArrowSprite()->getPhysicsBody()->getVelocity();
-		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
-		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
-	}
-	//this->pauseSchedulerAndActions();
-	this->pauselayer = PauseLayer::create();
-	this->pauselayer->mainStep3Layer = this;
-	this->pauselayer->mainPlayLayer = NULL;
-	this->pauselayer->mainStep2Layer = NULL;
-	this->addChild(pauselayer, 20);
-}
+//void MainStep3Scene::Pause(){
+//	Director::getInstance()->pause();
+//	if (this->_arrowLayer->isflying == true){
+//		speed = this->_arrowLayer->getArrowSprite()->getPhysicsBody()->getVelocity();
+//		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
+//		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
+//	}
+//	//this->pauseSchedulerAndActions();
+//	this->pauselayer = PauseLayer::create();
+//	this->pauselayer->mainStep3Layer = this;
+//	this->pauselayer->mainPlayLayer = NULL;
+//	this->pauselayer->mainStep2Layer = NULL;
+//	this->addChild(pauselayer, 20);
+//}

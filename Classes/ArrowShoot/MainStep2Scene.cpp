@@ -54,19 +54,19 @@ bool MainStep2Scene::init(){
 	setListener();
 	
 
-	/*¼üÅÌ¼àÌýÆ÷*/
-	auto listenerKeypad = EventListenerKeyboard::create();
-	listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event){
-		/*Èç¹û°´ESC¼ü´´½¨ÔÝÍ£²ã*/
-		if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
-			if (this->_flagPressed == false){
-				this->Pause();
-				this->_flagPressed = true;
-			}
+	///*¼üÅÌ¼àÌýÆ÷*/
+	//auto listenerKeypad = EventListenerKeyboard::create();
+	//listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event){
+	//	/*Èç¹û°´ESC¼ü´´½¨ÔÝÍ£²ã*/
+	//	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
+	//		if (this->_flagPressed == false){
+	//			this->Pause();
+	//			this->_flagPressed = true;
+	//		}
 
-		}
-	};
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeypad, this);
+	//	}
+	//};
+	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeypad, this);
 
 	this->scheduleUpdate();
 
@@ -144,6 +144,23 @@ void MainStep2Scene::onEventHappen(Layer * object, MyEvent e)
 	}
 }
 
+void MainStep2Scene::onAgain(Layer * objcet)
+{
+
+	//log("in mainstep2");
+	this->removeChild(objcet, true);
+
+	Director::getInstance()->resume();
+
+	this->_monsterLayer->unscheduleUpdate();
+	this->_arrowLayer->unscheduleUpdate();
+	this->unscheduleUpdate();
+
+	Director::getInstance()->replaceScene(
+		TransitionSplitRows::create(3.0f, MainStep2Scene::CreateScene()));
+
+}
+
 void MainStep2Scene::update(float dt)
 {
 	this->scores += 0.1;
@@ -186,22 +203,5 @@ void MainStep2Scene::update(float dt)
 
 }
 
-Vec2 MainStep2Scene::getSpeed(){
-	return this->speed;
-}
 
 
-void MainStep2Scene::Pause(){
-	Director::getInstance()->pause();
-	if (this->_arrowLayer->isflying == true){
-		speed = this->_arrowLayer->getArrowSprite()->getPhysicsBody()->getVelocity();
-		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
-		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
-	}
-	//this->pauseSchedulerAndActions();
-	this->pauselayer = PauseLayer::create();
-	this->pauselayer->mainStep2Layer = this;
-	this->pauselayer->mainStep3Layer = NULL;
-	this->pauselayer->mainPlayLayer = NULL;
-	this->addChild(pauselayer, 20);
-}

@@ -2,6 +2,21 @@
 #include"FailLayer.h"
 
 
+void GameLayer::onResume(Layer * objcet)
+{
+	_flagPressed = false;
+	//this->_arrowLayer->resume();
+
+	if (this->_arrowLayer->isflying) 
+	{
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setVelocity(_speed);
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setGravityEnable(TRUE);
+	}
+	this->removeChild(objcet, true);
+
+	Director::getInstance()->resume();
+}
+
 void GameLayer::deleteBurning(float dt)
 {
 	this->_burningBatch->setVisible(false);
@@ -21,6 +36,11 @@ void GameLayer::menuExitCallBack(cocos2d::Ref * pSender)
 	exit(0);
 #endif
 
+}
+
+bool GameLayer::isPause()
+{
+	return _flagPressed;
 }
 
 void GameLayer::setMap(MapLayer * mapLayer,int step)
@@ -143,5 +163,38 @@ void GameLayer::setListener()
 		}
 	};
 
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_contactListener, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(_contactListener, this);
+
+	auto listenerKeypad = EventListenerKeyboard::create();
+	listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event) {
+		/*如果按ESC键创建暂停层*/
+		if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE) {
+			if (this->_flagPressed == false) {
+				this->_flagPressed = true;
+				this->Pause();
+			}
+
+		}
+	};
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeypad, this);
+
+
+}
+
+void GameLayer::Pause()
+{
+	Director::getInstance()->pause();
+
+	//this->_arrowLayer->pause();
+
+	if (this->_arrowLayer->isflying == true) 
+	{
+		_speed = this->_arrowLayer->getArrowSprite()->getPhysicsBody()->getVelocity();
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
+	}
+	//this->pauseSchedulerAndActions();
+	this->_pauseLayer = PauseLayer::create();
+	this->_pauseLayer->addObserver(this);
+	this->addChild(_pauseLayer, 20);
 }

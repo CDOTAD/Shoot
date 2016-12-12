@@ -87,6 +87,8 @@ protected:
 
 	Vector<Sprite*> _vecArrowSprite;
 
+	bool isPause = false;
+
 	//Vector<Sprite*> vecArrowSprite;
 };
 

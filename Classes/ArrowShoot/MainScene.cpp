@@ -78,19 +78,19 @@ bool MainScene::init(){
 
 	
 	/*键盘监听器*/
-	auto listenerKeypad = EventListenerKeyboard::create();
-	listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode,Event* event){
-		/*如果按ESC键创建暂停层*/
-		if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
-			if (this->_flagPressed == false){
-				this->Pause();
-				this->_flagPressed = true;
-			}
-			
-		}
-	};
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeypad, this);
-	
+	//auto listenerKeypad = EventListenerKeyboard::create();
+	//listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode,Event* event){
+	//	/*如果按ESC键创建暂停层*/
+	//	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
+	//		if (this->_flagPressed == false){
+	//			this->Pause();
+	//			this->_flagPressed = true;
+	//		}
+	//		
+	//	}
+	//};
+	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeypad, this);
+	//
 	this->scheduleUpdate();
 
 	//this->schedule(schedule_selector(MainScene::judge), 3.0f, kRepeatForever,0.0f);
@@ -271,24 +271,28 @@ void MainScene::onEventHappen(Layer * object, MyEvent e)
 	
 }
 
-void MainScene::Pause(){
-	Director::getInstance()->pause();
-	if (this->_arrowLayer->isflying == true){
-		speed = this->_arrowLayer->getArrowSprite()->getPhysicsBody()->getVelocity();
-		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
-		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
-	}
-	//this->pauseSchedulerAndActions();
-	this->pauselayer = PauseLayer::create();
-	this->pauselayer->mainPlayLayer = this;
-	this->pauselayer->mainStep2Layer = NULL;
-	this->pauselayer->mainStep3Layer = NULL;
-	this->addChild(pauselayer, 20);
+void MainScene::onAgain(Layer * objcet)
+{
+	this->removeChild(objcet, true);
+
+	
+	//this->removeAllChildrenWithCleanup(true);
+
+
+	Director::getInstance()->resume();
+
+
+	this->_monsterLayer->unscheduleUpdate();
+	this->_arrowLayer->unscheduleUpdate();
+	this->unscheduleUpdate();
+	
+	//log("in mainstep1");
+
+	Director::getInstance()->replaceScene(
+		TransitionSplitRows::create(3.0f,MainScene::CreateScene()));
+
 }
 
-Vec2 MainScene::getSpeed(){
-	return this->speed;
-}
 
 void MainScene::menuExitCallBack(Ref* pSender){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)

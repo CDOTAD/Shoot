@@ -5,85 +5,6 @@
 #define pi 3.1415926
 
 
-
-//bool ArrowSpriteLayer::init()
-//{
-//	if (!Layer::create())
-//	{
-//		return false;
-//	}
-//
-//	/*layer1 = nullptr;
-//	layer2 = nullptr;
-//	layer3 = nullptr;*/
-//
-//	/*switch (this->step)
-//	{
-//	case 1: this->ARROWNUMBER = 10; break;
-//	case 2: this->ARROWNUMBER = 8; break;
-//	case 3: this->ARROWNUMBER = 7; break;
-//	default:
-//		break;
-//	}*/
-//
-//	/*auto origin = Director::getInstance()->getVisibleOrigin();
-//	auto visibleSize = Director::getInstance()->getVisibleSize();*/
-//
-//	//for (int i = 1; i <= this->ARROWNUMBER; i++)
-//	//{
-//	//	Sprite* arrowSprite = Sprite::createWithSpriteFrameName("Arrow.png");
-//
-//	//	
-//
-//	//	_vecArrowSprite.pushBack(arrowSprite);
-//	//}
-//	//_arrowSprite = _vecArrowSprite.at(0);
-//	//_arrowSprite->setTag(10);
-//	//auto physicsArrowBody = PhysicsBody::createBox(_arrowSprite->getContentSize());
-//
-//
-//	//physicsArrowBody->setGravityEnable(false);
-//	///* 设置碰撞掩码*/
-//	//physicsArrowBody->setCategoryBitmask(1);
-//	//physicsArrowBody->setCollisionBitmask(-1);
-//	//physicsArrowBody->setContactTestBitmask(-1);
-//	//physicsArrowBody->setMass(100);
-//
-//
-//	//_arrowSprite->setPhysicsBody(physicsArrowBody);
-//	//this->addChild(_arrowSprite, 1);
-//
-//	/*设置触摸监听*/
-//	//auto listener = EventListenerTouchOneByOne::create();
-//
-//	//listener->onTouchBegan = CC_CALLBACK_2(ArrowSpriteLayer::onTouchBegan, this);
-//	////listener->onTouchMoved = CC_CALLBACK_2(ArrowSpriteLayer::onTouchMoved, this);
-//	//listener->onTouchEnded = CC_CALLBACK_2(ArrowSpriteLayer::onTouchEnded, this);
-//
-//	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-//
-//	//auto watch = EventListenerMouse::create();
-//
-//	//watch->onMouseMove = CC_CALLBACK_1(ArrowSpriteLayer::onMouseMove, this);
-//
-//	//_eventDispatcher->addEventListenerWithSceneGraphPriority(watch, this);
-//
-//	/*添加计数图标*/
-//	/*Sprite* arrowIcon = Sprite::createWithSpriteFrameName("Arrow.png");
-//	arrowIcon->setPosition(48, visibleSize.height - 25);
-//	this->addChild(arrowIcon, 1);
-//
-//	this->labelArrowNumLeft = LabelTTF::create("5", "Brush Script MT", 32);
-//	labelArrowNumLeft->setColor(Color3B(225, 225, 225));
-//	labelArrowNumLeft->setPosition(100, visibleSize.height - 25);
-//	this->addChild(labelArrowNumLeft, 1);*/
-//	//scheduleUpdate();
-//
-//	return true;
-//}
-
-
-
 bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event)
 {
 	if (_arrowSprite)
@@ -100,7 +21,7 @@ bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event)
 		Point locationArrowSprite = _arrowSprite->getPosition();
 		/*计算所需转过的角度*/
 		float angel = atan((locationTouch.y - locationArrowSprite.y) / (locationTouch.x - locationArrowSprite.x)) * 180 / pi;
-		if (this->isflying == false)
+		if (this->isflying == false && this->isPause == false) 
 		{
 			if (locationTouch.x == locationArrowSprite.x&&locationTouch.y < locationArrowSprite.y)
 			{
@@ -314,7 +235,7 @@ void ArrowSpriteLayer::onTouchEnded(Touch* touch, Event* event)
 
 		/*判断是否有箭在飞，如果在飞则不作出动作，如果没有则执行动作*/
 		/*根据按下的时间长短给予不同的初速度*/
-		if (this->isflying == false)
+		if (this->isflying == false && this->isPause == false)
 		{
 			_arrowSprite->getPhysicsBody()->setGravityEnable(true);
 
@@ -553,6 +474,7 @@ void ArrowSpriteLayer::onContact()
 
 
 
+
 void ArrowSpriteLayer::setArrowPosition(TMXObjectGroup* arrowObjectGroup)
 {
 	ValueMap arrowPointMap = arrowObjectGroup->getObject("Heros");
@@ -587,7 +509,7 @@ void ArrowSpriteLayer::onMouseMove(Event* event)
 		/*计算需要转的角度*/
 		float locationTouchY = 1280 - locationTouch.y;
 		float angel = atan((locationTouchY - locationArrowSprite.y) / (locationTouch.x - locationArrowSprite.y)) * 180 / pi;
-		if (this->isflying == false)
+		if (this->isflying == false && this->isPause == false) 
 		{
 			// log("locationTouch.x = %lf,locationTouch.y = %lf, locationArrowSprite.x = %lf locationArrowSprite.y = %lf", locationTouch.x, 1280.0 - locationTouch.y, locationArrowSprite.x, locationArrowSprite.y);
 			if (locationTouch.x == locationArrowSprite.x&&locationTouchY < locationArrowSprite.y)
