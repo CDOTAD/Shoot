@@ -48,8 +48,8 @@ private:
 	Scene* _scene;
 
 	Sprite* musicon;
-	Sprite* myHero;
-	Sprite* arch;
+	//Sprite* myHero;
+	//Sprite* arch;
 	PauseLayer* pauselayer;
 	WinLayer* winlayer;
 	FailLayer* faillayer;
