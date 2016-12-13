@@ -43,11 +43,11 @@ bool GameLayer::isPause()
 	return _flagPressed;
 }
 
-void GameLayer::setMap(MapLayer * mapLayer,int step)
+void GameLayer::setMap(MapLayer * mapLayer)
 {
 	this->_mapLayer = mapLayer;
 
-	this->_mapLayer->step = step;
+	//this->_mapLayer->step = step;
 	this->addChild(_mapLayer, 1);
 }
 
