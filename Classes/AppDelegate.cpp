@@ -59,6 +59,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
     //auto scene = MainScene::CreateScene();
 	auto scene =FirstScene::CreateScene();
 
+
+
+
+	////
     // run
     director->runWithScene(scene);
 
