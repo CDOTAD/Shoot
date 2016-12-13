@@ -50,12 +50,55 @@ bool PauseLayer::init(){
 }
 
 void PauseLayer::menuResumeCallBack(Ref* pSender){
-	_observer->onResume(this);
+	//if (this->mainPlayLayer != NULL){
+	//	/*this->mainPlayLayer->flagPressed = false;
+	//	if (this->mainPlayLayer->arrow->isflying == true){
+	//		this->mainPlayLayer->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(this->mainPlayLayer->getSpeed());
+	//		this->mainPlayLayer->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(true);
+	//	}
+	//	this->removeFromParentAndCleanup(true);
+	//	Director::getInstance()->resume();*/
+
+	//}
+	//else if (this->mainStep2Layer != NULL){
+	//	this->mainStep2Layer->flagPressed = false;
+	//	if (this->mainStep2Layer->arrow->isflying == true){
+	//		this->mainStep2Layer->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(this->mainStep2Layer->getSpeed());
+	//		this->mainStep2Layer->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(true);
+	//	}
+	//	this->removeFromParentAndCleanup(true);
+	//	Director::getInstance()->resume();
+	//}
+	//else if (this->mainStep3Layer != NULL){
+	//	this->mainStep2Layer->flagPressed = false;
+	//	if (this->mainStep3Layer->arrow->isflying == true){
+	//		this->mainStep3Layer->arrow->getArrowSprite()->getPhysicsBody()->setVelocity(this->mainStep3Layer->getSpeed());
+	//		this->mainStep3Layer->arrow->getArrowSprite()->getPhysicsBody()->setGravityEnable(true);		
+	//	}	
+	//}
 }
 
 void PauseLayer::menuAgainCallBack(Ref* pSender){
+	if (this->mainPlayLayer != NULL){
+		this->removeFromParentAndCleanup(true);
+		Director::getInstance()->resume();
+		Director::getInstance()->replaceScene(
+			TransitionSplitRows::create(3.0f, MainScene::CreateScene()));
 
-	_observer->onAgain(this);
+	}
+	else if (this->mainStep2Layer != NULL){
+		this->removeFromParentAndCleanup(true);
+		Director::getInstance()->resume();
+		Director::getInstance()->replaceScene(
+			TransitionSplitRows::create(3.0f, MainStep2Scene::CreateScene()));
+	}
+	else if (this->mainStep3Layer != NULL){
+		this->removeFromParentAndCleanup(true);
+		Director::getInstance()->resume();
+		Director::getInstance()->replaceScene(
+			TransitionSplitRows::create(3.0f, MainStep3Scene::CreateScene()));
+	
+	}
 }
 
 void PauseLayer::menuExitCallBack(Ref* pSender){
@@ -70,9 +113,4 @@ void PauseLayer::menuExitCallBack(Ref* pSender){
 	exit(0);
 #endif
 
-}
-
-void PauseLayer::addObserver(PauseObserver * observer)
-{
-	_observer = observer;
 }

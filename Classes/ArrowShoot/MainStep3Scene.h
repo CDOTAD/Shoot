@@ -27,9 +27,9 @@ public:
 	virtual void update(float dt);
 	virtual void setBurning(float dt);
 	virtual void onEventHappen(Layer* object, MyEvent e);
-	virtual void onAgain(Layer* objcet);
 public:
-	
+	void judge(float dt);
+	void Pause();
 	
 	void deleteBurning(float dt);
 	void menuExitCallBack(cocos2d::Ref* pSender);
@@ -47,8 +47,8 @@ private:
 	int arrowleft = 0;
 
 	Sprite* musicon;
-	//Sprite* myHero;
-	//Sprite* arch;
+	Sprite* myHero;
+	Sprite* arch;
 	PauseLayer* pauselayer;
 	WinLayer* winlayer;
 	FailLayer* faillayer;

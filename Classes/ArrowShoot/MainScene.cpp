@@ -1,6 +1,8 @@
 #include"MainScene.h"
 #include"FirstScene.h"
-#include"Factory.h"
+#include"MainStep2Scene.h"
+#include"ArrowSpriteStep1Layer.h"
+#include"MonsterSpriteStep1Layer.h"
 
 
 
@@ -22,29 +24,71 @@ bool MainScene::init(){
 		return false;
 	}
 
+	
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("AS_Zombie.plist");
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("B_Figure.plist");
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Pictures.plist");
+
 	_arrowNumber = STEP_ONE_ARROW;
 	_monsterNumber = MONSTER_NUM;
 
-
+	Director* dir = Director::getInstance();
+	Size visibleSize = dir->getVisibleSize();
 	
 	/*加载地图*/
+	this->_mapLayer = MapLayer::create();
 
-	setMap(MapLayer::create(), 1);
+	//this->map->setPosition(10, 10);
 
-	/*加载退出按钮 菜单 弓*/
-	setCommonPart();
-
+	this->_mapLayer->step = 1;
+	this->addChild(_mapLayer, 1);
 	
-	/*加载箭头*/
+	//log("map.position = (%f , %f)", map->getPositionX(), map->getPositionY());
 
-	setArrowLayer(Factory::createArrowSpriteLayer(ArrowSpriteStep1));
+
+	/*创建退出按钮*/
+	auto exitButton = MenuItemSprite::create(
+		Sprite::createWithSpriteFrameName("exit.png"),
+		Sprite::createWithSpriteFrameName("exitOn.png"),
+		CC_CALLBACK_1(MainScene::menuExitCallBack, this));
+	exitButton->setScale(0.4);
+	
+	auto menu = Menu::create(exitButton, NULL);
+	menu->setPosition(visibleSize.width*0.9, 32);
+	this->addChild(menu, 2);
+
+	/*加载箭头*/
+	this->_arrowLayer = ArrowSpriteStep1Layer::create();
+	this->_arrowLayer->setTag(ARROW_LAYER_TAG);
+	//this->_arrowLayer->step = 1;
+	this->_arrowLayer->addObserver(this);
+	_arrowLayer->setArrowPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_arrowLayer,2);
+	
+	/*加载弓*/
+	arch = Sprite::createWithSpriteFrameName("arch.png");
+	ValueMap archPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
+	float archX = archPointMap.at("x").asFloat();
+	float archY = archPointMap.at("y").asFloat();
+	arch->setPosition(archX + 20 , archY + 30);
+	arch->setScale(0.7f);
+	this->addChild(arch, 1);
 
 	/*加载怪物*/
-	setMonsterLayer(Factory::createMonsterSpriteLayer(MonsterSpriteStep1));
-
-
+	this-> _monsterLayer = MonsterSpriteStep1Layer::create();
+	this->_monsterLayer->setTag(MONSTER_LAYER_TAG);
+	this->_monsterLayer->addObserver(this);
+	_monsterLayer->setMonstersPosition(this->_mapLayer->getObjectGroup());
+	this->addChild(_monsterLayer, 2);
+	
 	/*创建英雄*/
-	setHero(Sprite::createWithSpriteFrameName("B_huolong.png"));
+	myHero = Sprite::createWithSpriteFrameName("B_huolong.png");
+	ValueMap heroPointMap = this->_mapLayer->getObjectGroup()->getObject("Heros");
+	float heroX = heroPointMap.at("x").asFloat();
+	float heroY = heroPointMap.at("y").asFloat();
+	myHero->setPosition(heroX + 25-64, heroY + 50);
+	myHero->setScale(0.1f);
+	this->addChild(myHero, 1);
 	
 	/*创建火焰效果*/
 	ValueMap firePointMap = this->_mapLayer->getObjectGroup()->getObject("Fire");
@@ -71,24 +115,73 @@ bool MainScene::init(){
 	this->addChild(burningbatch, 10);
 
 	/*碰撞监听器*/
+	_contactListener = EventListenerPhysicsContact::create();
+	
+	_contactListener->onContactBegin = [=](PhysicsContact &contact){
+		auto nodeA = contact.getShapeA()->getBody()->getNode();
+		auto nodeB = contact.getShapeB()->getBody()->getNode();
+		if (nodeA&&nodeB){
+			if (nodeA->getTag() == 10){
+				//nodeB->getPhysicsBody()->removeFromWorld();
+				//nodeB->removeFromParent();
+				
 
-	setListener();
+				/*
 
+				this->monsterLayer->onContact(int tag);
+
+				*/
+				
+				nodeB->getPhysicsBody()->removeFromWorld();
+				nodeB->setVisible(false);
+			}
+			else if (nodeB->getTag() == 10){
+				//nodeA->getPhysicsBody()->removeFromWorld();
+				//nodeA->removeFromParent();
+				nodeA->getPhysicsBody()->removeFromWorld();
+				nodeA->setVisible(false);
+			}
+			_monsterLayer->onContact();
+		}
+
+
+		return true;
+	};
+
+	_contactListener->onContactSeparate = [=](PhysicsContact &contact) {
+		if (this->_arrowLayer->getArrowSprite()) 
+		{
+			this->_arrowLayer->getArrowSprite()->getPhysicsBody()->removeFromWorld();
+			/*this->getScene()->getPhysicsWorld()->removeBody(_arrowLayer->getArrowSprite()->getPhysicsBody());
+			log("%d", this->getScene()->getTag());*/
+			this->_arrowLayer->getArrowSprite()->setVisible(false);
+			if (_monsterLayer->getMonsterNumber() > 0) {
+
+				//log("contactSeparate");
+
+				this->_arrowLayer->changeArrowSpriteReferTo();
+				this->_arrowLayer->onContact();
+				this->_arrowLayer->updateLabel();
+			}
+		}
+	};
+
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_contactListener, this);
 	
 	/*键盘监听器*/
-	//auto listenerKeypad = EventListenerKeyboard::create();
-	//listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode,Event* event){
-	//	/*如果按ESC键创建暂停层*/
-	//	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
-	//		if (this->_flagPressed == false){
-	//			this->Pause();
-	//			this->_flagPressed = true;
-	//		}
-	//		
-	//	}
-	//};
-	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeypad, this);
-	//
+	auto listenerKeypad = EventListenerKeyboard::create();
+	listenerKeypad->onKeyPressed = [=](EventKeyboard::KeyCode keyCode,Event* event){
+		/*如果按ESC键创建暂停层*/
+		if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE){
+			if (this->_flagPressed == false){
+				this->Pause();
+				this->_flagPressed = true;
+			}
+			
+		}
+	};
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeypad, this);
+	
 	this->scheduleUpdate();
 
 	//this->schedule(schedule_selector(MainScene::judge), 3.0f, kRepeatForever,0.0f);
@@ -132,6 +225,8 @@ void MainScene::update(float dt){
 					//arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 					arrowSprite->stopAllActions();
 
+					//arrowSprite->removeFromParent();
+
 					this->_arrowLayer->changeArrowSpriteReferTo();
 
 					this->_arrowLayer->updateLabel();
@@ -145,9 +240,11 @@ void MainScene::update(float dt){
 			float burningY = this->burningbatch->getPosition().y;
 			if ((arrowX + arrowSprite->getContentSize().width / 2) >= 8 * 32 && (arrowX - arrowSprite->getContentSize().width / 2) <= 11 * 32) {
 				//arrowSprite->getPhysicsBody()->removeFromWorld();
-				arrowSprite->removeFromParent();//removeFromPhysicsWorld();
 				arrowSprite->stopAllActions();
-				arrowSprite->setVisible(false);
+				
+				arrowSprite->removeFromParent();//removeFromPhysicsWorld();
+				
+				//arrowSprite->setVisible(false);
 
 				this->_arrowLayer->changeArrowSpriteReferTo();
 
@@ -230,7 +327,7 @@ void MainScene::onEventHappen(Layer * object, MyEvent e)
 		auto step2 = MainStep2Scene::create();
 		/*step2->Scores = 0.2*score;*/
 		Director::getInstance()->replaceScene(
-			TransitionSplitRows::create(3.0f, Factory::createMainScene(MainStep2)));
+			TransitionSplitRows::create(3.0f, MainStep2Scene::CreateScene()));
 
 		break;
 	
@@ -239,9 +336,7 @@ void MainScene::onEventHappen(Layer * object, MyEvent e)
 		if (((ArrowSpriteLayer*)object)->getArrowSprite()) 
 		{
 			float angle = ((ArrowSpriteLayer*)object)->getArrowSprite()->getRotation();
-
-			this->_arch->setRotation(angle);
-
+			this->arch->setRotation(angle);
 		}		break;
 	}
 	case Contact: {
@@ -269,28 +364,24 @@ void MainScene::onEventHappen(Layer * object, MyEvent e)
 	
 }
 
-void MainScene::onAgain(Layer * objcet)
-{
-	this->removeChild(objcet, true);
-
-	
-	//this->removeAllChildrenWithCleanup(true);
-
-
-	Director::getInstance()->resume();
-
-
-	this->_monsterLayer->unscheduleUpdate();
-	this->_arrowLayer->unscheduleUpdate();
-	this->unscheduleUpdate();
-	
-	//log("in mainstep1");
-
-	Director::getInstance()->replaceScene(
-		TransitionSplitRows::create(3.0f,MainScene::CreateScene()));
-
+void MainScene::Pause(){
+	Director::getInstance()->pause();
+	if (this->_arrowLayer->isflying == true){
+		speed = this->_arrowLayer->getArrowSprite()->getPhysicsBody()->getVelocity();
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setVelocity(Vec2::ZERO);
+		this->_arrowLayer->getArrowSprite()->getPhysicsBody()->setGravityEnable(FALSE);
+	}
+	//this->pauseSchedulerAndActions();
+	this->pauselayer = PauseLayer::create();
+	this->pauselayer->mainPlayLayer = this;
+	this->pauselayer->mainStep2Layer = NULL;
+	this->pauselayer->mainStep3Layer = NULL;
+	this->addChild(pauselayer, 20);
 }
 
+Vec2 MainScene::getSpeed(){
+	return this->speed;
+}
 
 void MainScene::menuExitCallBack(Ref* pSender){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)

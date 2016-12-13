@@ -9,6 +9,7 @@ bool ArrowSpriteStep2Layer::init()
 
 	this->ARROWNUMBER = STEP_TWO_ARROW;
 
+
 	setArroSprite();
 
 	setListener();

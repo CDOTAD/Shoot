@@ -1,4 +1,5 @@
 #include "AppDelegate.h"
+//#include "HelloWorldScene.h"
 #include"ArrowShoot\FirstScene.h"
 
 USING_NS_CC;

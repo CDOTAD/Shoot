@@ -11,12 +11,13 @@ bool MonsterSpriteStep2Layer::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
 	//addMonster();
+	this->_vecMonsterSprite = new ConcreteAggregate<Sprite*>(MONSTER_NUM);
 
 	/*将怪物精灵装进容器*/
 	this->addMonster();
 	for (int i = 1; i <= MONSTER_NUM; i++) {
 		
-		Sprite* monsterSprite = this->vecMonsterSprite.at(i - 1);
+		Sprite* monsterSprite = this->_vecMonsterSprite->Pop(i - 1);
 
 		auto moveBy1 = MoveBy::create(timerand(i), Vec2(64, monsterSprite->getPositionY()));
 		auto moveBy2 = MoveBy::create(1.5*timerand(i), Vec2(-128, monsterSprite->getPositionY()));

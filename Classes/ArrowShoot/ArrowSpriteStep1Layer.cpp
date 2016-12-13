@@ -10,6 +10,8 @@ bool ArrowSpriteStep1Layer::init()
 
 	this->ARROWNUMBER = STEP_ONE_ARROW;
 
+	//this->_vecArrowSprite = new ConcreteAggregate<Sprite*>(ARROWNUMBER);
+
 	setArroSprite();
 
 	setListener();

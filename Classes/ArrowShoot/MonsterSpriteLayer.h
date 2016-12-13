@@ -4,6 +4,7 @@
 
 #include"cocos2d.h"
 #include"Observer.h"
+#include"Iterator.h"
 using namespace cocos2d;
 
 class MonsterSpriteLayer :public Layer{
@@ -37,7 +38,8 @@ protected:
 	char name[20];
 	LabelTTF* labelMonsterNumLeft;
 	/*存放怪物精灵的容器*/
-	Vector<Sprite*>vecMonsterSprite;
+	//Vector<Sprite*>vecMonsterSprite;
+	ConcreteAggregate<Sprite*>* _vecMonsterSprite;
 
 };
 

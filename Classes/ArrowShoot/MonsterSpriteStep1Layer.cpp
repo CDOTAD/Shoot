@@ -9,7 +9,8 @@ bool MonsterSpriteStep1Layer::init()
 		auto origin = Director::getInstance()->getVisibleOrigin();
 		auto visibleSize = Director::getInstance()->getVisibleSize();
 	
-		
+		this->_vecMonsterSprite = new ConcreteAggregate<Sprite*>(MONSTER_NUM);
+
 		/*将怪物精灵装进容器*/
 		this->addMonster();
 

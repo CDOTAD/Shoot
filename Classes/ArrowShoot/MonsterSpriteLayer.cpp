@@ -118,7 +118,7 @@ float MonsterSpriteLayer::timerand(int i) {
 void MonsterSpriteLayer::addMonster()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
-
+	//this->_vecMonsterSprite = new ConcreteAggregate<Sprite*>(monsterNumber);
 	for (int i = 1; i <= MONSTER_NUM; i++) {
 		sprintf(name, "zombie%d.png", i);
 		Sprite* monsterSprite = Sprite::createWithSpriteFrameName(name);
@@ -138,7 +138,8 @@ void MonsterSpriteLayer::addMonster()
 
 		this->addChild(monsterSprite);
 
-		this->vecMonsterSprite.pushBack(monsterSprite);
+		//this->vecMonsterSprite.pushBack(monsterSprite);
+		this->_vecMonsterSprite->Push(monsterSprite,i-1);
 	
 		
 	}
@@ -150,18 +151,30 @@ void MonsterSpriteLayer::monsterNumberDecrease(){
 
 void MonsterSpriteLayer::setMonstersPosition(TMXObjectGroup* monsterObjectGroup){
 	char monstername[20];
-	for (int i = 0; i < MONSTER_NUM; i++){
-		Sprite* monsterSprite = this->vecMonsterSprite.at(i);
-		sprintf(monstername, "Monster%d", i+1);
-		ValueMap monsterPointMap = monsterObjectGroup->getObject(monstername);
-		float monsterX = monsterPointMap.at("x").asFloat();
-		float monsterY = monsterPointMap.at("y").asFloat();
-		
-		/*log("monsterX = %f monsterY = %f", monsterX, monsterY);
-*/
-		
+	//for (int i = 0; i < MONSTER_NUM; i++){
+	//	//Sprite* monsterSprite = this->vecMonsterSprite.at(i);
+	//	Sprite* monsterSprite = this->_vecMonsterSprite->Pop(i);
+	//	sprintf(monstername, "Monster%d", i+1);
+	//	ValueMap monsterPointMap = monsterObjectGroup->getObject(monstername);
+	//	float monsterX = monsterPointMap.at("x").asFloat();
+	//	float monsterY = monsterPointMap.at("y").asFloat();
+	//	
+	//	log("monsterX = %f monsterY = %f", monsterX, monsterY);
 
-		monsterSprite->setPosition(monsterX + 25, monsterY + 25);
+	//	
+
+	//	monsterSprite->setPosition(monsterX + 25, monsterY + 25);
+	//}
+	Iterator<Sprite*>* it = this->_vecMonsterSprite->createIterator();
+	for (it->first(); !it->isDone(); it->next())
+	{
+			Sprite* monsterSprite = it->currentItem();
+			sprintf(monstername, "Monster%d", it->current()+1);
+			ValueMap monsterPointMap = monsterObjectGroup->getObject(monstername);
+			float monsterX = monsterPointMap.at("x").asFloat();
+			float monsterY = monsterPointMap.at("y").asFloat();
+			log("monsterX = %f monsterY = %f", monsterX, monsterY);
+			monsterSprite->setPosition(monsterX + 25, monsterY + 25);
 	}
 }
 int MonsterSpriteLayer::getMonsterNumber(){

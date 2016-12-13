@@ -11,11 +11,11 @@ bool MonsterSpriteStep3Layer::init()
 	auto origin = Director::getInstance()->getVisibleOrigin();
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
-
+	this->_vecMonsterSprite = new ConcreteAggregate<Sprite*>(MONSTER_NUM);
 	/*将怪物精灵装进容器*/
 	this->addMonster();
 	for (int i = 1; i <= MONSTER_NUM; i++) {
-		Sprite* monsterSprite = this->vecMonsterSprite.at(i - 1);
+		Sprite* monsterSprite = this->_vecMonsterSprite->Pop(i - 1);
 		switch (i)
 		{
 		case 1:{
