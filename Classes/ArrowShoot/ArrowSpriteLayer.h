@@ -6,7 +6,6 @@
 
 #include"cocos2d.h"
 #include"Observer.h"
-#include"Iterator.h"
 
 
 using namespace cocos2d;
@@ -33,7 +32,9 @@ public:
 	/*设置时针频率*/
 	void setTimeFrequency();
 
-	
+	void myPause();
+
+	void myResume();
 
 	virtual void update(float dt);
 
@@ -86,8 +87,9 @@ protected:
 	char name[20];
 	/*用于存放箭头精灵的容器*/
 
-	//Vector<Sprite*> _vecArrowSprite;
-	ConcreteAggregate<Sprite*>* _vecArrowSprite;
+	Vector<Sprite*> _vecArrowSprite;
+
+	bool isPause = false;
 
 	//Vector<Sprite*> vecArrowSprite;
 };

@@ -27,28 +27,23 @@ public:
 	virtual void update(float dt);
 	virtual void setBurning(float dt);
 	virtual void onEventHappen(Layer* object, MyEvent e);
+	virtual void onAgain(Layer* objcet);
 public:
-	void judge(float dt);
-	void Pause();
+	
 	
 	void deleteBurning(float dt);
 	void menuExitCallBack(cocos2d::Ref* pSender);
 	CREATE_FUNC(MainStep3Scene);
 public:
-	/*bool flagPressed = false;
-	bool flagBurning = false;*/
+
 	float scores = 0;
 	static float Scores;
-public:
-	//ArrowSpriteLayer * arrow;//¼ýÍ·¾«Áé²ã
-	//MonsterSpriteLayer* monster;//¹ÖÎï¾«Áé²ã
-	//MapLayer* map;//ÍßÆ¬µØÍ¼²ã
+
 private:
 	int arrowleft = 0;
 
 	Sprite* musicon;
-	Sprite* myHero;
-	Sprite* arch;
+
 	PauseLayer* pauselayer;
 	WinLayer* winlayer;
 	FailLayer* faillayer;
