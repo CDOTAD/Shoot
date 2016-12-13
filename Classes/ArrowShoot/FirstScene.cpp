@@ -1,5 +1,5 @@
 #include"FirstScene.h"
-#include"SceneProduct.h"
+#include"Factory.h"
 
 Scene* FirstScene::CreateScene(){
 	auto scene = Scene::create();
@@ -45,7 +45,7 @@ bool FirstScene::init(){
 
 void FirstScene::menuStartCallback(Ref* pSender){
 	Director::getInstance()->replaceScene(
-		TransitionSplitRows::create( 3.0f,Scene1::CreateScene()));
+		TransitionSplitRows::create( 3.0f,Factory::createMainScene(MainStep1)));
 }
 
 void FirstScene::menuCloseCallback(Ref* pSender){

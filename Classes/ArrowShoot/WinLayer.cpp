@@ -1,5 +1,6 @@
 #include"WinLayer.h"
-#include"SceneProduct.h"
+#include"MainScene.h"
+#include"FirstScene.h"
 //#include "SceneMComplete.h"
 
 Scene* WinLayer::CreateScene(){
@@ -58,7 +59,7 @@ void WinLayer::menuNextCallBack(Ref* pSender){
 
 void WinLayer::menuAgainCallBack(Ref* pSender){
 	Director::getInstance()->resume();
-	Director::getInstance()->replaceScene(Scene1::CreateScene());
+	Director::getInstance()->replaceScene(MainScene::CreateScene());
 	
 }
 
@@ -78,5 +79,5 @@ void WinLayer::menuExitCallBack(Ref* pSender){
 
 void WinLayer::menuMenuCallBack(Ref* pSender){
 	Director::getInstance()->resume();
-	Director::getInstance()->replaceScene(SceneProduct::CreateScene());
+	Director::getInstance()->replaceScene(FirstScene::CreateScene());
 }

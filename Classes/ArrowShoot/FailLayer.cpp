@@ -1,6 +1,9 @@
 #include"FailLayer.h"
 #include"FirstScene.h"
-#include"SceneProduct.h"
+#include "MainScene.h"
+#include "MainStep2Scene.h"
+#include "MainStep3Scene.h"
+//#include "SceneMComplete.h"
 
 Scene* FailLayer::CreateScene(){
 	auto scene = Scene::create();
@@ -51,19 +54,19 @@ void FailLayer::menuAgainCallBack(Ref* pSender){
 		this->removeFromParentAndCleanup(true);
 		Director::getInstance()->resume();
 		Director::getInstance()->replaceScene(
-			TransitionSplitRows::create(1.5f, Scene1::CreateScene()));
+			TransitionSplitRows::create(1.5f, MainScene::CreateScene()));
 	}
 	else if (this->mainStep2Layer != NULL){
 		this->removeFromParentAndCleanup(true);
 		Director::getInstance()->resume();
 		Director::getInstance()->replaceScene(
-			TransitionSplitRows::create(1.5f, Scene2::CreateScene()));
+			TransitionSplitRows::create(1.5f, MainStep2Scene::CreateScene()));
 	}
 	else if (this->mainStep3Layer != NULL){
 		this->removeFromParentAndCleanup(true);
 		Director::getInstance()->resume();
 		Director::getInstance()->replaceScene(
-			TransitionSplitRows::create(1.5f, Scene3::CreateScene()));
+			TransitionSplitRows::create(1.5f, MainStep3Scene::CreateScene()));
 	}
 }
 

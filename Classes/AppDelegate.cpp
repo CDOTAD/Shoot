@@ -1,6 +1,6 @@
 #include "AppDelegate.h"
-#include"ArrowShoot\AbstractFactory.h"
-#include"ArrowShoot\SceneProduct.h"
+#include"ArrowShoot\FirstScene.h"
+
 USING_NS_CC;
 
 static cocos2d::Size designResolutionSize = cocos2d::Size(480, 320);
@@ -57,14 +57,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // create a scene. it's an autorelease object
     //auto scene = MainScene::CreateScene();
+	auto scene =FirstScene::CreateScene();
 
-	director->runWithScene(SceneProduct::CreateScene());
-	
+    // run
+    director->runWithScene(scene);
 
-
-
-
-	
     return true;
 }
 

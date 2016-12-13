@@ -1,10 +1,11 @@
 #pragma once
 #include"cocos2d.h"
 #include"Observer.h"
+#include"ArrowSpriteLayer.h"
+#include"MonsterSpriteLayer.h"
 #include"MapLayer.h"
 #include"PauseLayer.h"
-#include"MonsterProduct.h"
-#include"ArrowProduct.h"
+
 
 
 
@@ -31,13 +32,13 @@ public:
 	bool isPause();
 protected:
 
-	void setMap(MapLayer* mapLayer);
+	void setMap(MapLayer* mapLayer,int step);
 
 	void setCommonPart();
 
-	void setArrowLayer(ArrowProduct* arrowLayer);
+	void setArrowLayer(ArrowSpriteLayer* arrowLayer);
 
-	void setMonsterLayer(MonsterProduct* monsterLayer);
+	void setMonsterLayer(MonsterSpriteLayer* monsterLayer);
 
 	void setHero(Sprite* myHero);
 
@@ -49,8 +50,8 @@ protected:
 	bool _flagBurning = false;
 
 protected:
-	ArrowProduct* _arrowLayer;
-	MonsterProduct* _monsterLayer;
+	ArrowSpriteLayer* _arrowLayer;
+	MonsterSpriteLayer* _monsterLayer;
 	MapLayer* _mapLayer;
 	
 
@@ -64,7 +65,7 @@ protected:
 	int _arrowNumber;
 	int _monsterNumber;
 
-public:
+private:
 	PauseLayer* _pauseLayer;
 
 	bool _flagPressed = false;

@@ -43,11 +43,11 @@ bool GameLayer::isPause()
 	return _flagPressed;
 }
 
-void GameLayer::setMap(MapLayer * mapLayer)
+void GameLayer::setMap(MapLayer * mapLayer,int step)
 {
 	this->_mapLayer = mapLayer;
 
-	//this->_mapLayer->step = step;
+	this->_mapLayer->step = step;
 	this->addChild(_mapLayer, 1);
 }
 
@@ -77,7 +77,7 @@ void GameLayer::setCommonPart()
 	this->addChild(_arch, 1);
 }
 
-void GameLayer::setArrowLayer(ArrowProduct * arrowLayer)
+void GameLayer::setArrowLayer(ArrowSpriteLayer * arrowLayer)
 {
 	this->_arrowLayer = arrowLayer;
 	this->_arrowLayer->setTag(ARROW_LAYER_TAG);
@@ -88,7 +88,7 @@ void GameLayer::setArrowLayer(ArrowProduct * arrowLayer)
 
 }
 
-void GameLayer::setMonsterLayer(MonsterProduct * monsterLayer)
+void GameLayer::setMonsterLayer(MonsterSpriteLayer * monsterLayer)
 {
 	this->_monsterLayer = monsterLayer;
 	this->_monsterLayer->setTag(MONSTER_LAYER_TAG);
