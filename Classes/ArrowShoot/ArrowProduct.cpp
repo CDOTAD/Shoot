@@ -1,11 +1,19 @@
-#include"ArrowSpriteLayer.h"
-#include<cmath>
-#include"MonsterSpriteLayer.h"
+#include "ArrowProduct.h"
+#include "MapLayer.h"
+#include <math.h>
 
 #define pi 3.1415926
+void ArrowProduct::myPause()
+{
+	this->isPause = true;
+}
 
+void ArrowProduct::myResume()
+{
+	this->isPause = false;
+}
 
-bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event)
+bool ArrowProduct::onTouchBegan(Touch* touch, Event* event)
 {
 	if (_arrowSprite)
 	{
@@ -21,7 +29,7 @@ bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event)
 		Point locationArrowSprite = _arrowSprite->getPosition();
 		/*计算所需转过的角度*/
 		float angel = atan((locationTouch.y - locationArrowSprite.y) / (locationTouch.x - locationArrowSprite.x)) * 180 / pi;
-		if (this->isflying == false && this->isPause == false) 
+		if (this->isflying == false)
 		{
 			if (locationTouch.x == locationArrowSprite.x&&locationTouch.y < locationArrowSprite.y)
 			{
@@ -29,55 +37,18 @@ bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event)
 				_arrowSprite->setRotation(angel0);
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 			else if (locationTouch.x == locationArrowSprite.x&&locationTouch.y > locationArrowSprite.y)
 			{
 				float angel0 = -90;
 				_arrowSprite->setRotation(angel0);
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 			else if (locationTouch.x < locationArrowSprite.x&&locationTouch.y == locationArrowSprite.y)
 			{
 				auto rotateTo = RotateTo::create(0.1f, -180);
 				_arrowSprite->runAction(rotateTo);
 				_observer->onEventHappen(this, ArrowRotate);
-				/*arrowSprite->setRotation(-180);
-				if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(-180);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(-180);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(-180);
-				}*/
 			}
 			else if (locationTouch.x > locationArrowSprite.x&&locationTouch.y == locationArrowSprite.y)
 			{
@@ -98,18 +69,6 @@ bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event)
 
 				_observer->onEventHappen(this, ArrowRotate);
 
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 			else if (locationTouch.x > locationArrowSprite.x&&locationTouch.y < locationArrowSprite.y)
 			{
@@ -125,18 +84,7 @@ bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event)
 				}
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
+
 			}
 			else if (locationTouch.x<locationArrowSprite.x&&locationTouch.y>locationArrowSprite.y)
 			{
@@ -144,18 +92,7 @@ bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event)
 				_arrowSprite->setRotation(angel0);
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
+
 			}
 			else if (locationTouch.x < locationArrowSprite.x&&locationTouch.y < locationArrowSprite.y)
 			{
@@ -163,25 +100,13 @@ bool ArrowSpriteLayer::onTouchBegan(Touch* touch, Event* event)
 				_arrowSprite->setRotation(angel0);
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 		}
 	}
 	return true;
 }
 
-void ArrowSpriteLayer::onTouchEnded(Touch* touch, Event* event)
+void ArrowProduct::onTouchEnded(Touch* touch, Event* event)
 {
 	if (_arrowSprite)
 	{
@@ -235,7 +160,7 @@ void ArrowSpriteLayer::onTouchEnded(Touch* touch, Event* event)
 
 		/*判断是否有箭在飞，如果在飞则不作出动作，如果没有则执行动作*/
 		/*根据按下的时间长短给予不同的初速度*/
-		if (this->isflying == false && this->isPause == false)
+		if (this->isflying == false)
 		{
 			_arrowSprite->getPhysicsBody()->setGravityEnable(true);
 
@@ -285,47 +210,41 @@ void ArrowSpriteLayer::onTouchEnded(Touch* touch, Event* event)
 		}
 	}
 }
-
-void ArrowSpriteLayer::onTouchCancelled(Touch* touch, Event* event)
+void ArrowProduct::onTouchCancelled(Touch* touch, Event* event)
 {
 	return;
 }
 
-void ArrowSpriteLayer::setTimeFrequency()
+void ArrowProduct::setTimeFrequency()
 {
 	LARGE_INTEGER frequency;
 	QueryPerformanceFrequency(&frequency);
 	timeFrequency = (double)frequency.QuadPart;
 }
 
-void ArrowSpriteLayer::myPause()
+ArrowProduct * ArrowProduct::operationArrow()
 {
-	this->isPause = true;
+	return nullptr;
 }
 
-void ArrowSpriteLayer::myResume()
-{
-	this->isPause = false;
-}
-
-void ArrowSpriteLayer::setListener()
+void ArrowProduct::setListener()
 {
 	auto listener = EventListenerTouchOneByOne::create();
 
-	listener->onTouchBegan = CC_CALLBACK_2(ArrowSpriteLayer::onTouchBegan, this);
+	listener->onTouchBegan = CC_CALLBACK_2(ArrowProduct::onTouchBegan, this);
 	//listener->onTouchMoved = CC_CALLBACK_2(ArrowSpriteLayer::onTouchMoved, this);
-	listener->onTouchEnded = CC_CALLBACK_2(ArrowSpriteLayer::onTouchEnded, this);
+	listener->onTouchEnded = CC_CALLBACK_2(ArrowProduct::onTouchEnded, this);
 
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	auto watch = EventListenerMouse::create();
 
-	watch->onMouseMove = CC_CALLBACK_1(ArrowSpriteLayer::onMouseMove, this);
+	watch->onMouseMove = CC_CALLBACK_1(ArrowProduct::onMouseMove, this);
 
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(watch, this);
 }
 
-void ArrowSpriteLayer::setLabel()
+void ArrowProduct::setLabel()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -340,7 +259,7 @@ void ArrowSpriteLayer::setLabel()
 	this->addChild(labelArrowNumLeft, 1);
 }
 
-void ArrowSpriteLayer::setArroSprite()
+void ArrowProduct::setArroSprite()
 {
 
 	this->spriteNum = 0;
@@ -370,12 +289,12 @@ void ArrowSpriteLayer::setArroSprite()
 	this->addChild(_arrowSprite, 1);
 }
 
-Sprite* ArrowSpriteLayer::getArrowSprite()
+Sprite* ArrowProduct::getArrowSprite()
 {
 	return _arrowSprite;
 }
 
-void ArrowSpriteLayer::changeArrowSpriteReferTo()
+void ArrowProduct::changeArrowSpriteReferTo()
 {
 
 	auto origin = Director::getInstance()->getVisibleOrigin();
@@ -405,15 +324,12 @@ void ArrowSpriteLayer::changeArrowSpriteReferTo()
 	}
 }
 
-void ArrowSpriteLayer::update(float dt)
+void ArrowProduct::update(float dt)
 {
 	/*判断箭是否飞出屏幕，如果飞出则换箭（可以飞出屏幕上方再落回）*/
-	//log("this->arrownumber = %d - this->spriteNum = %d  = %d", this->ARROWNUMBER, this->spriteNum, this->ARROWNUMBER - this->spriteNum);
-	
-	log("isPause = %d", isPause);
+	log("this->arrownumber = %d - this->spriteNum = %d  = %d", this->ARROWNUMBER, this->spriteNum, this->ARROWNUMBER - this->spriteNum);
 
-
-	if (_arrowSprite) 
+	if (_arrowSprite)
 	{
 		Point arrowSpritePosition = _arrowSprite->getPosition();
 		Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -430,43 +346,21 @@ void ArrowSpriteLayer::update(float dt)
 				_observer->onEventHappen(this, ArrowOut);
 
 
-				//arrowSprite->removeFromPhysicsWorld();
 				changeArrowSpriteReferTo();
 			}
 		}
 	}
-	else 
+	else
 	{
 		unscheduleUpdate();
 		_observer->onEventHappen(this, NoArrow);
 	}
-	
-	/*更新计数图标*/
-	/*if (this->ARROWNUMBER - spriteNum >= 0)
-	{
-		this->labelArrowNumLeft->removeFromParentAndCleanup(true);
-		char num[20];
-		sprintf(num, "%d", this->ARROWNUMBER - spriteNum);
-		this->labelArrowNumLeft = LabelTTF::create(num, "Brush Script MT", 32);
-		labelArrowNumLeft->setColor(Color3B(225, 225, 225));
-		labelArrowNumLeft->setPosition(100, visibleSize.height - 25);
-		this->addChild(labelArrowNumLeft, 1);
-	}*/
+
 }
 
-void ArrowSpriteLayer::updateLabel()
+void ArrowProduct::updateLabel()
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	/*if (this->ARROWNUMBER - spriteNum >= 0)
-	{
-		layer->labelArrowNumLeft->removeFromParentAndCleanup(true);
-		char num[20];
-		sprintf(num, "%d", this->ARROWNUMBER - spriteNum);
-		layer->labelArrowNumLeft = LabelTTF::create(num, "Brush Script MT", 32);
-		labelArrowNumLeft->setColor(Color3B(225, 225, 225));
-		labelArrowNumLeft->setPosition(100, visibleSize.height - 25);
-		layer->addChild(labelArrowNumLeft, 1);
-	}*/
 	if (this->ARROWNUMBER - spriteNum >= 0)
 	{
 		this->labelArrowNumLeft->removeFromParentAndCleanup(true);
@@ -479,16 +373,14 @@ void ArrowSpriteLayer::updateLabel()
 	}
 }
 
-void ArrowSpriteLayer::onContact()
+void ArrowProduct::onContact()
 {
-	//this->changeArrowSpriteReferTo();
 	_observer->onEventHappen(this, Contact);
 }
 
 
 
-
-void ArrowSpriteLayer::setArrowPosition(TMXObjectGroup* arrowObjectGroup)
+void ArrowProduct::setArrowPosition(TMXObjectGroup* arrowObjectGroup)
 {
 	ValueMap arrowPointMap = arrowObjectGroup->getObject("Heros");
 	float arrowX = arrowPointMap.at("x").asFloat();
@@ -500,18 +392,17 @@ void ArrowSpriteLayer::setArrowPosition(TMXObjectGroup* arrowObjectGroup)
 	}
 }
 
-int ArrowSpriteLayer::getArrowSpriteNumber()
+int ArrowProduct::getArrowSpriteNumber()
 {
-	//log("aasdfsdfsd   %d", spriteNum);
 	return this->ARROWNUMBER - this->spriteNum;
 }
 
-void ArrowSpriteLayer::addObserver(Observer * observer)
+void ArrowProduct::addObserver(Observer * observer)
 {
 	_observer = observer;
 }
 
-void ArrowSpriteLayer::onMouseMove(Event* event)
+void ArrowProduct::onMouseMove(Event* event)
 {
 	if (_arrowSprite)
 	{
@@ -522,27 +413,14 @@ void ArrowSpriteLayer::onMouseMove(Event* event)
 		/*计算需要转的角度*/
 		float locationTouchY = 1280 - locationTouch.y;
 		float angel = atan((locationTouchY - locationArrowSprite.y) / (locationTouch.x - locationArrowSprite.y)) * 180 / pi;
-		if (this->isflying == false && this->isPause == false) 
+		if (this->isflying == false)
 		{
-			// log("locationTouch.x = %lf,locationTouch.y = %lf, locationArrowSprite.x = %lf locationArrowSprite.y = %lf", locationTouch.x, 1280.0 - locationTouch.y, locationArrowSprite.x, locationArrowSprite.y);
 			if (locationTouch.x == locationArrowSprite.x&&locationTouchY < locationArrowSprite.y)
 			{
 				float angel0 = 90;
 				_arrowSprite->setRotation(angel0);
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 			else if (locationTouch.x == locationArrowSprite.x&&locationTouchY > locationArrowSprite.y)
 			{
@@ -550,18 +428,6 @@ void ArrowSpriteLayer::onMouseMove(Event* event)
 				_arrowSprite->setRotation(angel0);
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 			else if (locationTouch.x < locationArrowSprite.x&&locationTouchY == locationArrowSprite.y)
 			{
@@ -570,18 +436,6 @@ void ArrowSpriteLayer::onMouseMove(Event* event)
 				_arrowSprite->setRotation(-180);
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(-180);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(-180);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(-180);
-				}*/
 			}
 			else if (locationTouch.x > locationArrowSprite.x&&locationTouchY == locationArrowSprite.y)
 			{
@@ -601,18 +455,6 @@ void ArrowSpriteLayer::onMouseMove(Event* event)
 				}
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 			else if (locationTouch.x > locationArrowSprite.x&&locationTouchY < locationArrowSprite.y)
 			{
@@ -628,18 +470,6 @@ void ArrowSpriteLayer::onMouseMove(Event* event)
 				}
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 			else if (locationTouch.x<locationArrowSprite.x&&locationTouchY>locationArrowSprite.y)
 			{
@@ -647,18 +477,6 @@ void ArrowSpriteLayer::onMouseMove(Event* event)
 				_arrowSprite->setRotation(angel0);
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 			else if (locationTouch.x < locationArrowSprite.x&&locationTouchY < locationArrowSprite.y)
 			{
@@ -666,19 +484,37 @@ void ArrowSpriteLayer::onMouseMove(Event* event)
 				_arrowSprite->setRotation(angel0);
 
 				_observer->onEventHappen(this, ArrowRotate);
-				/*if (layer1 != nullptr)
-				{
-					layer1->arch->setRotation(angel0);
-				}
-				else if (layer2 != nullptr)
-				{
-					layer2->arch->setRotation(angel0);
-				}
-				else if (layer3 != nullptr)
-				{
-					layer3->arch->setRotation(angel0);
-				}*/
 			}
 		}
 	}
 }
+Arrow::Arrow() {
+
+}
+
+Arrow::~Arrow() {
+
+}
+ArrowProduct* Arrow::operationArrow()
+{
+	return Arrow::create();
+}
+
+bool Arrow::init()
+{
+	if (!ArrowProduct::create())
+	{
+		return false;
+	}
+
+	this->ARROWNUMBER = STEP_ONE_ARROW;
+
+	setArroSprite();
+
+	setListener();
+	setLabel();
+
+	scheduleUpdate();
+	return true;
+}
+

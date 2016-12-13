@@ -1,40 +1,30 @@
-#ifndef _ArrowSpriteLayer_H_
-#define _ArrowSpriteLayer_H_
+ï»¿#pragma once
+#ifndef _ARROWPRODUCT_H_
+#define _ARROWPRODUCT_H_
 
-#define ARROWS_NUM 10
 
-
-#include"cocos2d.h"
+#include <stdio.h>
 #include"Observer.h"
+#include"cocos2d.h"
 
-
-using namespace cocos2d;
-
-//class MainScene;
-//class MainStep2Scene;
-//class MainStep3Scene;
-
-class ArrowSpriteLayer :public Layer
-{
+class ArrowProduct :public Layer {
 public:
-	virtual bool init()=0;
-	/*´¥Ãş¼àÌıº¯Êı*/
+	virtual bool init() = 0;
+	/*è§¦æ‘¸ç›‘å¬å‡½æ•°*/
 	bool onTouchBegan(Touch* touch, Event* event);
 	void onTouchEnded(Touch* touch, Event* event);
 	void onTouchCancelled(Touch* touch, Event* event);
 	void onMouseMove(Event* event);
-	/*¸ù¾İÍßÆ¬µØÍ¼ÀïµÄĞÅÏ¢³õÊ¼»¯¼ıµÄÎ»ÖÃ*/
+	/*æ ¹æ®ç“¦ç‰‡åœ°å›¾é‡Œçš„ä¿¡æ¯åˆå§‹åŒ–ç®­çš„ä½ç½®*/
 	void setArrowPosition(TMXObjectGroup* arrowObjectGroup);
-	/*»ñÈ¡¼ıÍ·¾«Áé*/
+	/*è·å–ç®­å¤´ç²¾çµ*/
 	Sprite* getArrowSprite();
-	/*¸Ä±ä¼ıÍ·¾«ÁéÖ¸ÏòµÄ¼ıÍ·*/
+	/*æ”¹å˜ç®­å¤´ç²¾çµæŒ‡å‘çš„ç®­å¤´*/
 	void changeArrowSpriteReferTo();
-	/*ÉèÖÃÊ±ÕëÆµÂÊ*/
+	/*è®¾ç½®æ—¶é’ˆé¢‘ç‡*/
 	void setTimeFrequency();
 
-	void myPause();
-
-	void myResume();
+	virtual ArrowProduct* operationArrow();
 
 	virtual void update(float dt);
 
@@ -42,7 +32,10 @@ public:
 
 	void onContact();
 
-	/*»ñµÃ¼ıÍ·µÄÊ£Óà¸öÊı*/
+	void myPause();
+
+	void myResume();
+	/*è·å¾—ç®­å¤´çš„å‰©ä½™ä¸ªæ•°*/
 	int getArrowSpriteNumber();
 	void addObserver(Observer* observer);
 	//CREATE_FUNC(ArrowSpriteLayer);
@@ -52,15 +45,15 @@ protected:
 	void setLabel();
 
 	void setArroSprite();
-	
+
 	
 
 
 public:
 	bool isflying = false;
 	float scores = 0;
+	bool isPause = false;
 
-	
 	/*MainScene* layer1;
 	MainStep2Scene* layer2;
 	MainStep3Scene* layer3;*/
@@ -68,7 +61,7 @@ protected:
 
 	Observer* _observer;
 
-	/*¼ıÍ·¾«Áé*/
+	/*ç®­å¤´ç²¾çµ*/
 	Sprite* _arrowSprite;
 
 	int spriteNum;
@@ -77,22 +70,32 @@ protected:
 
 	int ARROWNUMBER;
 
-	//´æ´¢Ê±ÕëÆµÂÊ
+	//å­˜å‚¨æ—¶é’ˆé¢‘ç‡
 	double timeFrequency;
-	//´æ´¢´¥ÃşÊÂ¼ş·¢ÉúÊ±µÄÊ±¼ä
+	//å­˜å‚¨è§¦æ‘¸äº‹ä»¶å‘ç”Ÿæ—¶çš„æ—¶é—´
 	double touchBeganTime;
-	//´æ´¢´¥ÃşÊÂ¼ş½áÊøÊ±µÄÊ±¼ä
+	//å­˜å‚¨è§¦æ‘¸äº‹ä»¶ç»“æŸæ—¶çš„æ—¶é—´
 	double touchEndedTime;
 
 	char name[20];
-	/*ÓÃÓÚ´æ·Å¼ıÍ·¾«ÁéµÄÈİÆ÷*/
+	/*ç”¨äºå­˜æ”¾ç®­å¤´ç²¾çµçš„å®¹å™¨*/
 
 	Vector<Sprite*> _vecArrowSprite;
 
-	bool isPause = false;
-
 	//Vector<Sprite*> vecArrowSprite;
+
 };
 
+class Arrow :public ArrowProduct {
+public:
+	Arrow();
+	virtual ~Arrow();
+
+public:
+	virtual bool init();
+	ArrowProduct* operationArrow();
+	CREATE_FUNC(Arrow);
+
+};
 
 #endif

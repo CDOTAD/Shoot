@@ -77,7 +77,7 @@ void GameLayer::setCommonPart()
 	this->addChild(_arch, 1);
 }
 
-void GameLayer::setArrowLayer(ArrowSpriteLayer * arrowLayer)
+void GameLayer::setArrowLayer(ArrowProduct * arrowLayer)
 {
 	this->_arrowLayer = arrowLayer;
 	this->_arrowLayer->setTag(ARROW_LAYER_TAG);
@@ -88,7 +88,7 @@ void GameLayer::setArrowLayer(ArrowSpriteLayer * arrowLayer)
 
 }
 
-void GameLayer::setMonsterLayer(MonsterSpriteLayer * monsterLayer)
+void GameLayer::setMonsterLayer(MonsterProduct * monsterLayer)
 {
 	this->_monsterLayer = monsterLayer;
 	this->_monsterLayer->setTag(MONSTER_LAYER_TAG);
