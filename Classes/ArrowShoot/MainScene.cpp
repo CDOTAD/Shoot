@@ -3,6 +3,7 @@
 #include"MainStep2Scene.h"
 #include"ArrowSpriteStep1Layer.h"
 #include"MonsterSpriteStep1Layer.h"
+#include"MapStep1Layer.h"
 
 
 
@@ -31,7 +32,7 @@ bool MainScene::init(){
 	
 	/*加载地图*/
 
-	setMap(MapLayer::create(), 1);
+	setMap(MapStep1Layer::create());
 
 	/*加载退出按钮 菜单 弓*/
 	setCommonPart();
@@ -227,7 +228,7 @@ void MainScene::onEventHappen(Layer * object, MyEvent e)
 
 		float score = MAX_SCORES + 4 * this->_arrowLayer->getArrowSpriteNumber() - 8 * this->_monsterLayer->getMonsterNumber() - 0.01*this->scores;
 		//this->_arrowLayer->step = 2;
-		this->_mapLayer->step = 2;
+		//this->_mapLayer->step = 2;
 		//this->_monsterLayer->step = 2;
 		auto step2 = MainStep2Scene::create();
 		/*step2->Scores = 0.2*score;*/

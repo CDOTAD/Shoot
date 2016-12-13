@@ -1,6 +1,8 @@
 #include"MainStep3Scene.h"
 #include"ArrowSpriteStep3Layer.h"
 #include"MonsterSpriteStep3Layer.h"
+#include"MainStep3Scene.h"
+#include"MapStep3Layer.h"
 
 float MainStep3Scene::Scores = 0;
 
@@ -25,7 +27,7 @@ bool MainStep3Scene::init(){
 	_arrowNumber = STEP_THREE_ARROW;
 
 	/*加载地图*/
-	setMap(MapLayer::create(), 3);
+	setMap(MapStep3Layer::create());
 
 	setCommonPart();
 	/*加载箭头*/

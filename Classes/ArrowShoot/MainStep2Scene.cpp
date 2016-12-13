@@ -2,6 +2,7 @@
 #include"MainStep3Scene.h"
 #include"ArrowSpriteStep2Layer.h"
 #include"MonsterSpriteStep2Layer.h"
+#include"MapStep2Layer.h"
 
 float MainStep2Scene::Scores = 0;
 
@@ -31,7 +32,7 @@ bool MainStep2Scene::init(){
 	_monsterNumber = MONSTER_NUM;
 
 	/*加载地图*/
-	setMap(MapLayer::create(), 2);
+	setMap(MapStep2Layer::create());
 
 	/*创建退出按钮*/
 
@@ -102,7 +103,7 @@ void MainStep2Scene::onEventHappen(Layer * object, MyEvent e)
 	case NoMonster: {
 
 		//this->_arrowLayer->step = 3;
-		this->_mapLayer->step = 3;
+		//this->_mapLayer->step = 3;
 		//this->_monsterLayer->step = 3;
 		//auto step3 = MainStep3Scene::create();
 		//step3->Scores = 0.3*score;

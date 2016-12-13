@@ -32,7 +32,7 @@ public:
 	bool isPause();
 protected:
 
-	void setMap(MapLayer* mapLayer,int step);
+	void setMap(MapLayer* mapLayer);
 
 	void setCommonPart();
 
