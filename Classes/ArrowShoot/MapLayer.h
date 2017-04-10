@@ -7,13 +7,11 @@ class MapLayer :public Layer{
 public:
 
 	virtual bool init()=0;
-	/*·µ»ØÍßÆ¬µØÍ¼*/
+	/*è¿”å›žç“¦ç‰‡åœ°å›¾*/
 	TMXTiledMap* getMap();
 	//CREATE_FUNC(MapLayer);
 public:
-	//static int step;
-public:
-	/*·µ»ØÍßÆ¬µØÍ¼ÖÐµÄ¶ÔÏó²ã*/
+	/*è¿”å›žç“¦ç‰‡åœ°å›¾ä¸­çš„å¯¹è±¡å±‚*/
 	TMXObjectGroup* getObjectGroup();
 	void addMap(std::string file);
 private:
